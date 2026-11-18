@@ -10,6 +10,11 @@ html {
   letter-spacing: var(--text-tracking);
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
 html.lenis,
 html.lenis body {
   height: auto;

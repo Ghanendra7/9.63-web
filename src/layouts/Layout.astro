@@ -30,7 +30,7 @@ const {
   <body>
     <Header currentPath={Astro.url.pathname} namespace={namespace} transition:persist="global-header" />
 
-    <main id="main-content" data-namespace={namespace}>
+    <main id="main-content" data-namespace={namespace} transition:animate="fade">
       <slot />
     </main>
 

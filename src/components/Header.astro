@@ -17,7 +17,7 @@ const navItems = [
 <header class="site-header" id="site-header">
   <div class="header-inner">
     <div class="header-left">
-      <a href="/" class="brand-pill" aria-label="9.63 Home">
+      <a href="/" class="brand-pill" id="brand-link" aria-label="9.63 Home">
         <img src="/brand-logo.svg" alt="9 . 6 3" class="brand-logo" />
       </a>
     </div>
@@ -25,7 +25,7 @@ const navItems = [
     <div class="header-right">
       <nav class="nav-bar" id="main-nav">
         {navItems.map((item) => {
-          const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+          const isActive = currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href + "/"));
           return (
             <a
               href={item.href}
@@ -33,9 +33,11 @@ const navItems = [
               data-nav-key={item.key}
               aria-label={item.label}
             >
-              <span class="nav-bullet" aria-hidden="true" />
-              <span class="nav-full-label">{item.label}</span>
               <span class="nav-initial-label" aria-hidden="true">{item.initial}</span>
+              <span class="nav-expanded-content">
+                <span class="nav-bullet" aria-hidden="true" />
+                <span class="nav-full-label">{item.label}</span>
+              </span>
             </a>
           );
         })}
@@ -45,16 +47,14 @@ const navItems = [
         </button>
       </nav>
 
-      {namespace === "home" && (
-        <div class="sub-bar column-switcher" id="column-switcher">
-          <button type="button" class="col-btn is-active" data-col="1" aria-label="1 Column view">
-            1
-          </button>
-          <button type="button" class="col-btn" data-col="8" aria-label="8 Column view">
-            8
-          </button>
-        </div>
-      )}
+      <div class="sub-bar column-switcher" id="column-switcher" style={namespace === "home" ? "display: flex;" : "display: none;"}>
+        <button type="button" class="col-btn is-active" data-col="1" aria-label="1 Column view">
+          1
+        </button>
+        <button type="button" class="col-btn" data-col="8" aria-label="8 Column view">
+          8
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -121,19 +121,19 @@ const navItems = [
   .nav-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
-    gap: 0;
+    height: var(--header-height);
   }
 
   .nav-pill {
     height: var(--header-height);
-    min-width: 30px;
+    flex: 0 0 30px;
+    width: 30px;
     border-radius: var(--radius-pill);
     background-color: var(--color-pill-light);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     font-size: var(--text-size);
@@ -143,15 +143,10 @@ const navItems = [
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.2s var(--ease-expo), flex 0.35s var(--ease-expo), min-width 0.35s var(--ease-expo);
-    padding: 0;
+    transition: flex 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s var(--ease-expo);
     position: relative;
     overflow: hidden;
-  }
-
-  .nav-pill:not(.is-active) {
-    width: 30px;
-    flex-shrink: 0;
+    padding: 0;
   }
 
   .nav-pill:hover {
@@ -159,14 +154,47 @@ const navItems = [
   }
 
   .nav-pill.is-active {
-    flex: 1;
+    flex: 1 1 0%;
     background-color: var(--color-pill-active);
-    padding: 0 14px;
+  }
+
+  .nav-initial-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    transition: opacity 0.2s var(--ease-expo), transform 0.25s var(--ease-expo);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .nav-pill.is-active .nav-initial-label {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+
+  .nav-expanded-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.3s var(--ease-expo) 0.08s, transform 0.35s var(--ease-expo) 0.08s;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .nav-pill.is-active .nav-expanded-content {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
   }
 
   .nav-bullet {
-    display: none;
     width: 10.5px;
     height: 10.5px;
     border-radius: 50%;
@@ -175,27 +203,13 @@ const navItems = [
   }
 
   .nav-full-label {
-    display: none;
     white-space: nowrap;
   }
 
-  .nav-initial-label {
-    display: block;
-    line-height: 1;
-  }
-
-  .nav-pill.is-active .nav-bullet,
-  .nav-pill.is-active .nav-full-label {
-    display: block;
-  }
-
-  .nav-pill.is-active .nav-initial-label {
-    display: none;
-  }
-
   .nav-play-btn {
+    flex: 0 0 30px;
     width: 30px;
-    flex-shrink: 0;
+    margin-left: auto;
   }
 
   .play-icon {
@@ -214,7 +228,6 @@ const navItems = [
     display: flex;
     align-items: center;
     width: 100%;
-    margin-top: 5px;
   }
 
   .column-switcher {
@@ -242,12 +255,12 @@ const navItems = [
   }
 
   .col-btn:not(.is-active) {
+    flex: 0 0 30px;
     width: 30px;
-    flex-shrink: 0;
   }
 
   .col-btn.is-active {
-    flex: 1;
+    flex: 1 1 0%;
     background-color: var(--color-pill-active);
   }
 
@@ -264,32 +277,49 @@ const navItems = [
 </style>
 
 <script>
-  function updateActiveNav() {
-    const currentPath = window.location.pathname;
+  function setupNavHandlers() {
     const navPills = document.querySelectorAll<HTMLAnchorElement>("#main-nav a.nav-pill");
+    const brandLink = document.getElementById("brand-link");
+    const switcher = document.getElementById("column-switcher");
+
+    function applyActiveState(pathname: string) {
+      navPills.forEach((pill) => {
+        const href = pill.getAttribute("href");
+        if (href && (pathname === href || (href !== "/" && pathname.startsWith(href)))) {
+          pill.classList.add("is-active");
+        } else {
+          pill.classList.remove("is-active");
+        }
+      });
+
+      if (switcher) {
+        if (pathname === "/" || pathname === "") {
+          switcher.style.display = "flex";
+        } else {
+          switcher.style.display = "none";
+        }
+      }
+    }
 
     navPills.forEach((pill) => {
-      const href = pill.getAttribute("href");
-      if (href && (currentPath === href || (href !== "/" && currentPath.startsWith(href)))) {
-        pill.classList.add("is-active");
-      } else {
-        pill.classList.remove("is-active");
+      if (!pill.hasAttribute("data-bound")) {
+        pill.setAttribute("data-bound", "true");
+        pill.addEventListener("click", () => {
+          const href = pill.getAttribute("href") || "/";
+          applyActiveState(href);
+        });
       }
     });
 
-    const switcher = document.getElementById("column-switcher");
-    if (switcher) {
-      if (currentPath === "/" || currentPath === "") {
-        switcher.style.display = "flex";
-      } else {
-        switcher.style.display = "none";
-      }
+    if (brandLink && !brandLink.hasAttribute("data-bound")) {
+      brandLink.setAttribute("data-bound", "true");
+      brandLink.addEventListener("click", () => {
+        applyActiveState("/");
+      });
     }
+
+    applyActiveState(window.location.pathname);
   }
 
-  document.addEventListener("astro:page-load", updateActiveNav);
-
-  if (typeof window !== "undefined") {
-    (window as any).updateHeaderNav = updateActiveNav;
-  }
+  document.addEventListener("astro:page-load", setupNavHandlers);
 </script>
