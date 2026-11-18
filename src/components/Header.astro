@@ -149,8 +149,8 @@ const navItems = [
     overflow: hidden;
     padding: 0;
     transition:
-      flex 0.5s cubic-bezier(0.25, 1, 0.3, 1),
-      min-width 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+      flex var(--nav-collapse-duration) var(--ease-nav),
+      min-width var(--nav-collapse-duration) var(--ease-nav),
       background-color 0.25s ease;
   }
 
@@ -158,12 +158,20 @@ const navItems = [
     flex: 0 0 95px;
     min-width: 95px;
     background-color: var(--color-pill-frame);
+    transition:
+      flex var(--nav-hover-duration) var(--ease-nav),
+      min-width var(--nav-hover-duration) var(--ease-nav),
+      background-color 0.25s ease;
   }
 
   .nav-pill.is-active {
     flex: 1 1 0%;
     min-width: 120px;
     background-color: var(--color-pill-active);
+    transition:
+      flex var(--nav-click-duration) var(--ease-nav),
+      min-width var(--nav-click-duration) var(--ease-nav),
+      background-color 0.3s ease;
   }
 
   .nav-initial {
@@ -175,8 +183,8 @@ const navItems = [
     line-height: 1;
     pointer-events: none;
     transition:
-      opacity 0.2s ease,
-      transform 0.35s cubic-bezier(0.25, 1, 0.3, 1);
+      opacity 0.25s ease,
+      transform 0.4s var(--ease-nav);
   }
 
   .nav-pill:hover .nav-initial,
@@ -199,14 +207,22 @@ const navItems = [
     pointer-events: none;
     transition:
       opacity 0.3s ease 0.08s,
-      transform 0.4s cubic-bezier(0.25, 1, 0.3, 1) 0.08s;
+      transform 0.4s var(--ease-nav) 0.08s;
   }
 
-  .nav-pill:hover .nav-full,
+  .nav-pill:hover .nav-full {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
   .nav-pill.is-active .nav-full {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
+    transition:
+      opacity calc(var(--nav-click-duration) * 0.6) var(--ease-nav) calc(var(--nav-click-duration) * 0.18),
+      transform calc(var(--nav-click-duration) * 0.75) var(--ease-nav) calc(var(--nav-click-duration) * 0.18);
   }
 
   .nav-bullet {
@@ -272,7 +288,7 @@ const navItems = [
     align-items: center;
     justify-content: center;
     transition:
-      flex 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+      flex 0.5s var(--ease-nav),
       background-color 0.25s ease;
   }
 
