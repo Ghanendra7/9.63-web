@@ -25,7 +25,7 @@
   --header-height: 30px;
   --header-top: 17px;
   --page-margin: 20px;
-  --max-content-width: 1688px;
+  --max-content-width: 2560px;
 
   --grid-columns: 8;
   --grid-gutter: 20px;
@@ -33,7 +33,6 @@
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-nav: cubic-bezier(0.25, 1, 0.3, 1);
 
-  --nav-click-duration: 0.9s;
-  --nav-hover-duration: 0.4s;
-  --nav-collapse-duration: 0.65s;
+  --nav-expand-duration: 0.4s;
+  --nav-hover-duration: 0.3s;
 }

@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import Header from "../components/Header.astro";
 import BottomPill from "../components/BottomPill.astro";
 import "../styles/global.css";
@@ -25,22 +24,21 @@ const {
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
-    <ClientRouter />
   </head>
-  <body>
-    <Header transition:persist="global-header" />
+  <body data-barba="wrapper">
+    <Header />
 
-    <main id="main-content" data-namespace={namespace} transition:animate="fade">
+    <main id="main-content" data-barba="container" data-barba-namespace={namespace}>
       <slot />
     </main>
 
-    <BottomPill transition:persist="global-bottom-pill" />
+    <BottomPill />
 
     <script>
-      import { initMotion } from "../scripts/motion";
+      import { initPageTransitions } from "../scripts/motion";
 
       if (typeof window !== "undefined") {
-        initMotion();
+        initPageTransitions();
       }
     </script>
   </body>

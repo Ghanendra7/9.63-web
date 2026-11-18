@@ -8,11 +8,15 @@ html {
   font-size: var(--text-size);
   line-height: var(--text-leading);
   letter-spacing: var(--text-tracking);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 html.lenis,
