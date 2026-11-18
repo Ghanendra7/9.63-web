@@ -1,4 +1,6 @@
 ---
+import Header from "../components/Header.astro";
+import BottomPill from "../components/BottomPill.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -8,7 +10,7 @@ interface Props {
 }
 
 const {
-  title = "9.63 — Design Agency",
+  title = "9.63 — Studio",
   description = "New York based global design agency.",
   namespace = "home",
 } = Astro.props;
@@ -24,13 +26,13 @@ const {
     <title>{title}</title>
   </head>
   <body data-barba="wrapper">
-    <slot name="header" />
+    <Header currentPath={Astro.url.pathname} namespace={namespace} />
 
     <main data-barba="container" data-barba-namespace={namespace}>
       <slot />
     </main>
 
-    <slot name="footer" />
+    <BottomPill />
 
     <script>
       import { initPageTransitions } from "../scripts/motion";

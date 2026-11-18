@@ -1,0 +1,33 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="9.63 — Inquire" namespace="inquire">
+  <div class="page-container page-content">
+    <div class="content-wrapper">
+      <h1 class="page-title">Inquire</h1>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-content {
+    min-height: 100dvh;
+    padding-top: calc(var(--header-top) + var(--header-height) + 60px);
+    padding-bottom: 80px;
+  }
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-size: var(--text-size);
+    font-weight: 400;
+    letter-spacing: var(--text-tracking);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+</style>

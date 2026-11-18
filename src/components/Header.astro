@@ -1,0 +1,296 @@
+---
+interface Props {
+  currentPath?: string;
+  namespace?: string;
+}
+
+const { currentPath = Astro.url.pathname, namespace = "home" } = Astro.props;
+
+const navItems = [
+  { href: "/approach", label: "Approach", initial: "A", key: "approach" },
+  { href: "/studio", label: "Studio", initial: "S", key: "studio" },
+  { href: "/journal", label: "Journal", initial: "J", key: "journal" },
+  { href: "/inquire", label: "Inquire", initial: "I", key: "inquire" },
+];
+---
+
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <a href="/" class="brand-pill" aria-label="9.63 Home">
+        <img src="/brand-logo.svg" alt="9 . 6 3" class="brand-logo" />
+      </a>
+    </div>
+
+    <div class="header-right">
+      <nav class="nav-bar" id="main-nav">
+        {navItems.map((item) => {
+          const isActive = currentPath === item.href || currentPath.startsWith(item.href + "/");
+          return (
+            <a
+              href={item.href}
+              class={`nav-pill ${isActive ? "is-active" : ""}`}
+              data-nav-key={item.key}
+              aria-label={item.label}
+            >
+              <span class="nav-bullet" aria-hidden="true" />
+              <span class="nav-full-label">{item.label}</span>
+              <span class="nav-initial-label" aria-hidden="true">{item.initial}</span>
+            </a>
+          );
+        })}
+
+        <button type="button" class="nav-pill nav-play-btn" id="audio-toggle" aria-label="Toggle Music Player">
+          <span class="play-icon" />
+        </button>
+      </nav>
+
+      {namespace === "home" && (
+        <div class="sub-bar column-switcher" id="column-switcher">
+          <button type="button" class="col-btn is-active" data-col="1" aria-label="1 Column view">
+            1
+          </button>
+          <button type="button" class="col-btn" data-col="8" aria-label="8 Column view">
+            8
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: var(--header-top);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--page-margin);
+    padding-right: var(--page-margin);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--grid-gutter);
+    align-items: flex-start;
+  }
+
+  .header-left,
+  .header-right {
+    pointer-events: auto;
+  }
+
+  .brand-pill {
+    height: var(--header-height);
+    background-color: var(--color-pill-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius-brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    width: 100%;
+    transition: background-color 0.2s var(--ease-expo);
+  }
+
+  .brand-pill:hover {
+    background-color: var(--color-pill-frame);
+  }
+
+  .brand-logo {
+    width: 100%;
+    max-width: 802px;
+    height: 14px;
+    object-fit: contain;
+  }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+  }
+
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0;
+  }
+
+  .nav-pill {
+    height: var(--header-height);
+    min-width: 30px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-pill-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s var(--ease-expo), flex 0.35s var(--ease-expo), min-width 0.35s var(--ease-expo);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-pill:not(.is-active) {
+    width: 30px;
+    flex-shrink: 0;
+  }
+
+  .nav-pill:hover {
+    background-color: var(--color-pill-frame);
+  }
+
+  .nav-pill.is-active {
+    flex: 1;
+    background-color: var(--color-pill-active);
+    padding: 0 14px;
+    gap: 8px;
+  }
+
+  .nav-bullet {
+    display: none;
+    width: 10.5px;
+    height: 10.5px;
+    border-radius: 50%;
+    background-color: var(--color-text-primary);
+    flex-shrink: 0;
+  }
+
+  .nav-full-label {
+    display: none;
+    white-space: nowrap;
+  }
+
+  .nav-initial-label {
+    display: block;
+    line-height: 1;
+  }
+
+  .nav-pill.is-active .nav-bullet,
+  .nav-pill.is-active .nav-full-label {
+    display: block;
+  }
+
+  .nav-pill.is-active .nav-initial-label {
+    display: none;
+  }
+
+  .nav-play-btn {
+    width: 30px;
+    flex-shrink: 0;
+  }
+
+  .play-icon {
+    width: 10.5px;
+    height: 10.5px;
+    border-radius: 50%;
+    background-color: #828282;
+    transition: transform 0.2s var(--ease-expo);
+  }
+
+  .nav-play-btn:hover .play-icon {
+    transform: scale(1.15);
+  }
+
+  .sub-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .column-switcher {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .col-btn {
+    height: var(--header-height);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-pill-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: none;
+    cursor: pointer;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s var(--ease-expo), flex 0.35s var(--ease-expo);
+  }
+
+  .col-btn:not(.is-active) {
+    width: 30px;
+    flex-shrink: 0;
+  }
+
+  .col-btn.is-active {
+    flex: 1;
+    background-color: var(--color-pill-active);
+  }
+
+  @media (max-width: 768px) {
+    .header-inner {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      height: 12px;
+    }
+  }
+</style>
+
+<script>
+  function updateActiveNav() {
+    const currentPath = window.location.pathname;
+    const navPills = document.querySelectorAll<HTMLAnchorElement>("#main-nav a.nav-pill");
+
+    navPills.forEach((pill) => {
+      const href = pill.getAttribute("href");
+      if (href && (currentPath === href || (href !== "/" && currentPath.startsWith(href)))) {
+        pill.classList.add("is-active");
+      } else {
+        pill.classList.remove("is-active");
+      }
+    });
+
+    const switcher = document.getElementById("column-switcher");
+    if (switcher) {
+      if (currentPath === "/" || currentPath === "") {
+        switcher.style.display = "flex";
+      } else {
+        switcher.style.display = "none";
+      }
+    }
+  }
+
+  window.addEventListener("popstate", updateActiveNav);
+  document.addEventListener("DOMContentLoaded", updateActiveNav);
+
+  if (typeof window !== "undefined") {
+    (window as any).updateHeaderNav = updateActiveNav;
+  }
+</script>

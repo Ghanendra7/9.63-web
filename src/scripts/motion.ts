@@ -40,17 +40,22 @@ export function initPageTransitions() {
         leave({ current }) {
           return gsap.to(current.container, {
             opacity: 0,
-            duration: 0.4,
+            duration: 0.35,
             ease: "power2.inOut",
           });
         },
         enter({ next }) {
           scrollInstance.scrollTo(0, { immediate: true });
+
+          if (typeof window !== "undefined" && (window as any).updateHeaderNav) {
+            (window as any).updateHeaderNav();
+          }
+
           ScrollTrigger.refresh();
 
           return gsap.from(next.container, {
             opacity: 0,
-            duration: 0.4,
+            duration: 0.35,
             ease: "power2.inOut",
           });
         },

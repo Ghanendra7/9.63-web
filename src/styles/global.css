@@ -5,6 +5,9 @@ html {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   font-family: var(--font-primary);
+  font-size: var(--text-size);
+  line-height: var(--text-leading);
+  letter-spacing: var(--text-tracking);
 }
 
 html.lenis,
@@ -33,14 +36,34 @@ html.lenis body {
   color: var(--color-bg);
 }
 
-.grid-12 {
-  display: grid;
-  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
-  column-gap: var(--grid-gutter);
-}
-
 .page-container {
   padding-left: var(--page-margin);
   padding-right: var(--page-margin);
+  max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
+  margin-left: auto;
+  margin-right: auto;
   width: 100%;
+}
+
+.pill {
+  height: var(--header-height);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-pill-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-size);
+  line-height: var(--text-leading);
+  letter-spacing: var(--text-tracking);
+  color: var(--color-text-primary);
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease-expo), color 0.2s var(--ease-expo);
+}
+
+.pill-active {
+  background-color: var(--color-pill-active);
 }
