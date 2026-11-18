@@ -28,7 +28,7 @@ const {
     <ClientRouter />
   </head>
   <body>
-    <Header currentPath={Astro.url.pathname} namespace={namespace} transition:persist="global-header" />
+    <Header transition:persist="global-header" />
 
     <main id="main-content" data-namespace={namespace} transition:animate="fade">
       <slot />
