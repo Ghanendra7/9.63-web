@@ -131,20 +131,25 @@
 </style>
 
 <script>
-  const form = document.querySelector(".newsletter-form");
-  const label = document.querySelector(".newsletter-label");
-  const input = document.getElementById("newsletter-input") as HTMLInputElement | null;
+  function initNewsletter() {
+    const form = document.querySelector(".newsletter-form");
+    const label = document.querySelector(".newsletter-label");
+    const input = document.getElementById("newsletter-input") as HTMLInputElement | null;
 
-  if (form && label && input) {
-    label.addEventListener("click", () => {
-      form.classList.add("is-focused");
-      input.focus();
-    });
+    if (form && label && input && !form.hasAttribute("data-bound")) {
+      form.setAttribute("data-bound", "true");
+      label.addEventListener("click", () => {
+        form.classList.add("is-focused");
+        input.focus();
+      });
 
-    input.addEventListener("blur", () => {
-      if (!input.value) {
-        form.classList.remove("is-focused");
-      }
-    });
+      input.addEventListener("blur", () => {
+        if (!input.value) {
+          form.classList.remove("is-focused");
+        }
+      });
+    }
   }
+
+  document.addEventListener("astro:page-load", initNewsletter);
 </script>

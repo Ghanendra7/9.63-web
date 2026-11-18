@@ -1,4 +1,3 @@
-import barba from "@barba/core";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -8,9 +7,7 @@ gsap.registerPlugin(ScrollTrigger);
 let lenis: Lenis | null = null;
 
 export function initSmoothScroll(): Lenis {
-  if (lenis) {
-    lenis.destroy();
-  }
+  if (lenis) return lenis;
 
   lenis = new Lenis({
     duration: 1.2,
@@ -30,40 +27,15 @@ export function initSmoothScroll(): Lenis {
   return lenis;
 }
 
-export function initPageTransitions() {
+export function initMotion() {
   const scrollInstance = initSmoothScroll();
 
-  barba.init({
-    transitions: [
-      {
-        name: "default-transition",
-        leave({ current }) {
-          return gsap.to(current.container, {
-            opacity: 0,
-            duration: 0.35,
-            ease: "power2.inOut",
-          });
-        },
-        enter({ next }) {
-          scrollInstance.scrollTo(0, { immediate: true });
-
-          if (typeof window !== "undefined" && (window as any).updateHeaderNav) {
-            (window as any).updateHeaderNav();
-          }
-
-          ScrollTrigger.refresh();
-
-          return gsap.from(next.container, {
-            opacity: 0,
-            duration: 0.35,
-            ease: "power2.inOut",
-          });
-        },
-      },
-    ],
+  document.addEventListener("astro:after-swap", () => {
+    scrollInstance.scrollTo(0, { immediate: true });
+    ScrollTrigger.refresh();
   });
 
-  barba.hooks.after(() => {
+  document.addEventListener("astro:page-load", () => {
     ScrollTrigger.refresh();
   });
 }
