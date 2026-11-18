@@ -33,10 +33,10 @@ const navItems = [
               data-nav-key={item.key}
               aria-label={item.label}
             >
-              <span class="nav-initial-label" aria-hidden="true">{item.initial}</span>
-              <span class="nav-expanded-content">
+              <span class="nav-initial" aria-hidden="true">{item.initial}</span>
+              <span class="nav-full">
                 <span class="nav-bullet" aria-hidden="true" />
-                <span class="nav-full-label">{item.label}</span>
+                <span class="nav-label">{item.label}</span>
               </span>
             </a>
           );
@@ -124,13 +124,12 @@ const navItems = [
     width: 100%;
     height: var(--header-height);
     position: relative;
+    gap: 0;
   }
 
   .nav-pill {
     height: var(--header-height);
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 30px;
+    flex: 0 0 30px;
     min-width: 30px;
     border-radius: var(--radius-pill);
     background-color: var(--color-pill-light);
@@ -150,23 +149,24 @@ const navItems = [
     overflow: hidden;
     padding: 0;
     transition:
-      flex-grow 0.65s cubic-bezier(0.25, 1, 0.3, 1),
-      min-width 0.65s cubic-bezier(0.25, 1, 0.3, 1),
-      background-color 0.3s ease;
+      flex 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+      min-width 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+      background-color 0.25s ease;
   }
 
   .nav-pill:hover:not(.is-active) {
+    flex: 0 0 95px;
+    min-width: 95px;
     background-color: var(--color-pill-frame);
   }
 
   .nav-pill.is-active {
-    flex-grow: 1;
-    flex-shrink: 1;
+    flex: 1 1 0%;
     min-width: 120px;
     background-color: var(--color-pill-active);
   }
 
-  .nav-initial-label {
+  .nav-initial {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -175,39 +175,42 @@ const navItems = [
     line-height: 1;
     pointer-events: none;
     transition:
-      opacity 0.25s cubic-bezier(0.25, 1, 0.3, 1),
-      transform 0.4s cubic-bezier(0.25, 1, 0.3, 1);
+      opacity 0.2s ease,
+      transform 0.35s cubic-bezier(0.25, 1, 0.3, 1);
   }
 
-  .nav-pill.is-active .nav-initial-label {
+  .nav-pill:hover .nav-initial,
+  .nav-pill.is-active .nav-initial {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.6);
   }
 
-  .nav-expanded-content {
+  .nav-full {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     width: 100%;
     height: 100%;
-    padding: 0 16px;
+    padding: 0 14px;
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.92);
     white-space: nowrap;
     pointer-events: none;
     transition:
-      opacity 0.4s cubic-bezier(0.25, 1, 0.3, 1) 0.12s,
-      transform 0.5s cubic-bezier(0.25, 1, 0.3, 1) 0.12s;
+      opacity 0.3s ease 0.08s,
+      transform 0.4s cubic-bezier(0.25, 1, 0.3, 1) 0.08s;
   }
 
-  .nav-pill.is-active .nav-expanded-content {
+  .nav-pill:hover .nav-full,
+  .nav-pill.is-active .nav-full {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
   }
 
   .nav-bullet {
+    display: none;
     width: 10.5px;
     height: 10.5px;
     border-radius: 50%;
@@ -215,14 +218,16 @@ const navItems = [
     flex-shrink: 0;
   }
 
-  .nav-full-label {
+  .nav-pill.is-active .nav-bullet {
+    display: block;
+  }
+
+  .nav-label {
     white-space: nowrap;
   }
 
   .nav-play-btn {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 30px;
+    flex: 0 0 30px;
     width: 30px;
     margin-left: auto;
   }
@@ -267,20 +272,17 @@ const navItems = [
     align-items: center;
     justify-content: center;
     transition:
-      flex-grow 0.5s cubic-bezier(0.25, 1, 0.3, 1),
+      flex 0.5s cubic-bezier(0.25, 1, 0.3, 1),
       background-color 0.25s ease;
   }
 
   .col-btn:not(.is-active) {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 30px;
+    flex: 0 0 30px;
     width: 30px;
   }
 
   .col-btn.is-active {
-    flex-grow: 1;
-    flex-shrink: 1;
+    flex: 1 1 0%;
     background-color: var(--color-pill-active);
   }
 
