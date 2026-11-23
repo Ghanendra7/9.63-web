@@ -2,6 +2,7 @@
 dist/
 # generated types
 .astro/
+.sanity/
 
 # dependencies
 node_modules/
@@ -18,6 +19,9 @@ pnpm-debug.log*
 .env.production
 .env*.local
 .env.local
+
+# local temporary placeholders
+src/data/placeholders/
 
 # macOS-specific files
 .DS_Store

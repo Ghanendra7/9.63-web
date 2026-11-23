@@ -1,33 +1,277 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ConstellationCard from "../components/ConstellationCard.astro";
+import EditorialFooter from "../components/EditorialFooter.astro";
+import { getProjects } from "../lib/projects";
+
+const projects = await getProjects();
+
+const initialView = Astro.url.searchParams.get("view") || "1";
+const isInitialMulti = initialView === "8" || initialView === "3";
+
+const DESKTOP_SLOTS = [
+  { col: 2, row: 1 },
+  { col: 5, row: 1 },
+  { col: 8, row: 1 },
+  { col: 1, row: 2 },
+  { col: 6, row: 2 },
+  { col: 8, row: 2 },
+  { col: 3, row: 3 },
+  { col: 7, row: 3 },
+  { col: 8, row: 3 },
+  { col: 1, row: 4 },
+  { col: 6, row: 4 },
+  { col: 3, row: 5 },
+  { col: 8, row: 5 },
+  { col: 2, row: 6 },
+  { col: 8, row: 6 },
+  { col: 5, row: 6 },
+];
+
+const MOBILE_SLOTS = [
+  { col: 2, row: 1 },
+  { col: 1, row: 2 },
+  { col: 2, row: 2 },
+  { col: 3, row: 3 },
+  { col: 1, row: 4 },
+  { col: 2, row: 4 },
+  { col: 3, row: 4 },
+  { col: 2, row: 5 },
+  { col: 1, row: 6 },
+  { col: 3, row: 6 },
+  { col: 2, row: 7 },
+  { col: 1, row: 8 },
+  { col: 2, row: 8 },
+  { col: 3, row: 8 },
+  { col: 2, row: 9 },
+  { col: 1, row: 10 },
+];
 ---
 
 <Layout title="9.63 — Studio" namespace="home">
-  <div class="page-container home-feed">
-    <div class="placeholder-hero">
-      <span class="sub-label">Home Feed (1 / 8 Column Mode)</span>
+  <div class="home-container" id="home-feed-root">
+    <section class={`feed-1col ${!isInitialMulti ? "is-active" : "is-hidden"}`} id="feed-1col" aria-label="1 Column Project Feed">
+      <div class="feed-1col-inner">
+        {projects.map((project, index) => (
+          <ProjectCard project={project} index={index} totalProjects={projects.length} />
+        ))}
+      </div>
+    </section>
+
+    <section class={`feed-constellation ${isInitialMulti ? "is-active" : "is-hidden"}`} id="feed-constellation" aria-label="Constellation Project Grid">
+      <div class="constellation-grid" id="constellation-grid">
+        {projects.map((project, index) => {
+          const dSlot = DESKTOP_SLOTS[index % DESKTOP_SLOTS.length];
+          const mSlot = MOBILE_SLOTS[index % MOBILE_SLOTS.length];
+          const dCycle = Math.floor(index / DESKTOP_SLOTS.length);
+          const mCycle = Math.floor(index / MOBILE_SLOTS.length);
+          return (
+            <ConstellationCard
+              project={project}
+              index={index}
+              desktopCol={dSlot.col}
+              desktopRow={dSlot.row + dCycle * 6}
+              mobileCol={mSlot.col}
+              mobileRow={mSlot.row + mCycle * 10}
+            />
+          );
+        })}
+      </div>
+    </section>
+
+    <div class="feed-footer-wrapper">
+      <EditorialFooter />
     </div>
   </div>
 </Layout>
 
 <style>
-  .home-feed {
+  .home-container {
+    width: 100%;
     min-height: 100dvh;
-    padding-top: calc(var(--header-top) + var(--header-height) + 60px);
+    padding-top: calc(var(--header-top) + var(--header-height) + 50px);
     padding-bottom: 80px;
+    padding-left: var(--page-margin);
+    padding-right: var(--page-margin);
+    max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .placeholder-hero {
+  .feed-1col {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    min-height: 60vh;
+    transition: opacity 0.3s var(--ease-nav);
   }
 
-  .sub-label {
-    font-size: var(--text-size);
-    color: var(--color-text-muted);
-    letter-spacing: var(--text-tracking);
+  .feed-1col-inner {
+    max-width: 834px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  .feed-constellation {
+    width: 100%;
+    transition: opacity 0.3s var(--ease-nav);
+  }
+
+  .constellation-grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+  }
+
+  .feed-footer-wrapper {
+    width: 100%;
+    margin-top: 40px;
+  }
+
+  .is-hidden {
+    display: none !important;
+    opacity: 0;
+  }
+
+  .is-active {
+    display: block !important;
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .home-container {
+      padding-top: calc(var(--header-top) + var(--header-height) + 20px);
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-bottom: 60px;
+    }
+
+    .constellation-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3px;
+    }
+
+    .feed-1col-inner {
+      max-width: 100%;
+    }
   }
 </style>
+
+<script>
+  import { gsap } from "gsap";
+
+  function initFeedViewSwitcher() {
+    const feed1Col = document.getElementById("feed-1col");
+    const feedConstellation = document.getElementById("feed-constellation");
+
+    if (!feed1Col || !feedConstellation) return;
+
+    let currentMode = new URLSearchParams(window.location.search).get("view") || sessionStorage.getItem("feed_view_mode") || "1";
+
+    function setViewMode(mode: string, animate = true) {
+      currentMode = mode;
+      sessionStorage.setItem("feed_view_mode", mode);
+      const url = new URL(window.location.href);
+      if (mode === "8" || mode === "3") {
+        url.searchParams.set("view", mode);
+      } else {
+        url.searchParams.delete("view");
+      }
+      window.history.replaceState({}, "", url.toString());
+
+      if (typeof window !== "undefined" && (window as any).syncSwitcherState) {
+        (window as any).syncSwitcherState(mode);
+      }
+
+      const isMultiCol = mode === "8" || mode === "3";
+
+      if (isMultiCol) {
+        if (animate) {
+          gsap.to(feed1Col, {
+            opacity: 0,
+            duration: 0.2,
+            ease: "power2.inOut",
+            onComplete: () => {
+              feed1Col.classList.remove("is-active");
+              feed1Col.classList.add("is-hidden");
+              feedConstellation.classList.remove("is-hidden");
+              feedConstellation.classList.add("is-active");
+              gsap.fromTo(
+                feedConstellation,
+                { opacity: 0 },
+                {
+                  opacity: 1,
+                  duration: 0.35,
+                  ease: "power2.out",
+                  onComplete: () => {
+                    if ((window as any).__lenis) {
+                      (window as any).__lenis.resize();
+                    }
+                  },
+                }
+              );
+            },
+          });
+        } else {
+          feed1Col.classList.remove("is-active");
+          feed1Col.classList.add("is-hidden");
+          feedConstellation.classList.remove("is-hidden");
+          feedConstellation.classList.add("is-active");
+          feedConstellation.style.opacity = "1";
+        }
+      } else {
+        if (animate) {
+          gsap.to(feedConstellation, {
+            opacity: 0,
+            duration: 0.2,
+            ease: "power2.inOut",
+            onComplete: () => {
+              feedConstellation.classList.remove("is-active");
+              feedConstellation.classList.add("is-hidden");
+              feed1Col.classList.remove("is-hidden");
+              feed1Col.classList.add("is-active");
+              gsap.fromTo(
+                feed1Col,
+                { opacity: 0 },
+                {
+                  opacity: 1,
+                  duration: 0.35,
+                  ease: "power2.out",
+                  onComplete: () => {
+                    if ((window as any).__lenis) {
+                      (window as any).__lenis.resize();
+                    }
+                  },
+                }
+              );
+            },
+          });
+        } else {
+          feedConstellation.classList.remove("is-active");
+          feedConstellation.classList.add("is-hidden");
+          feed1Col.classList.remove("is-hidden");
+          feed1Col.classList.add("is-active");
+          feed1Col.style.opacity = "1";
+        }
+      }
+    }
+
+    window.addEventListener("feed-view-change", ((e: CustomEvent<{ mode: string }>) => {
+      if (e.detail?.mode) {
+        setViewMode(e.detail.mode, true);
+      }
+    }) as EventListener);
+
+    if (currentMode !== "1") {
+      setViewMode(currentMode, false);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFeedViewSwitcher);
+  } else {
+    initFeedViewSwitcher();
+  }
+</script>

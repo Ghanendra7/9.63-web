@@ -22,6 +22,10 @@ const mobileNavItems = [
 const activeHref = currentPath === "/" || currentPath === "" ? "/approach" : currentPath;
 const activeItem = navItems.find((item) => activeHref === item.href || (item.href !== "/" && activeHref.startsWith(item.href + "/"))) || navItems[0];
 const activeLabel = activeItem.label;
+
+const initialColView = Astro.url.searchParams.get("view") || "1";
+const isCol8 = initialColView === "8";
+const isCol3 = initialColView === "3";
 ---
 
 <header class="site-header" id="site-header">
@@ -58,10 +62,10 @@ const activeLabel = activeItem.label;
       </nav>
 
       <div class="sub-bar column-switcher" id="column-switcher">
-        <button type="button" class="col-btn is-active" data-col="1" aria-label="1 Column view">
+        <button type="button" class={`col-btn ${!isCol8 ? "is-active" : ""}`} data-col="1" aria-label="1 Column view">
           1
         </button>
-        <button type="button" class="col-btn" data-col="8" aria-label="8 Column view">
+        <button type="button" class={`col-btn ${isCol8 ? "is-active" : ""}`} data-col="8" aria-label="8 Column view">
           8
         </button>
       </div>
@@ -88,7 +92,7 @@ const activeLabel = activeItem.label;
         <span class="play-icon" />
       </button>
       <button type="button" class="mobile-col-btn" id="mobile-col-toggle" aria-label="Toggle Column View">
-        3
+        {isCol3 ? "1" : "3"}
       </button>
     </div>
   </div>
@@ -154,7 +158,7 @@ const activeLabel = activeItem.label;
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
     grid-template-columns: 1fr 1fr;
-    gap: var(--grid-gutter);
+    gap: 0px;
     align-items: flex-start;
   }
 
@@ -793,6 +797,45 @@ const activeLabel = activeItem.label;
         applyActiveState("/");
       });
     }
+
+    const colButtons = document.querySelectorAll<HTMLButtonElement>("#column-switcher .col-btn");
+    colButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const col = btn.getAttribute("data-col") || "1";
+        colButtons.forEach((b) => {
+          if (b.getAttribute("data-col") === col) {
+            b.classList.add("is-active");
+          } else {
+            b.classList.remove("is-active");
+          }
+        });
+        window.dispatchEvent(new CustomEvent("feed-view-change", { detail: { mode: col === "8" ? "8" : "1" } }));
+      });
+    });
+
+    if (mobileColBtn) {
+      mobileColBtn.addEventListener("click", () => {
+        const currentMode = mobileColBtn.textContent?.trim();
+        const nextMode = currentMode === "3" ? "3" : "1";
+        const buttonDisplay = nextMode === "3" ? "1" : "3";
+        mobileColBtn.textContent = buttonDisplay;
+        window.dispatchEvent(new CustomEvent("feed-view-change", { detail: { mode: nextMode } }));
+      });
+    }
+
+    function syncSwitcherState(mode: string) {
+      colButtons.forEach((b) => {
+        if (b.getAttribute("data-col") === mode) {
+          b.classList.add("is-active");
+        } else {
+          b.classList.remove("is-active");
+        }
+      });
+      if (mobileColBtn) {
+        mobileColBtn.textContent = mode === "3" || mode === "8" ? "1" : "3";
+      }
+    }
+    (window as any).syncSwitcherState = syncSwitcherState;
 
     (window as any).syncNavState = applyActiveState;
     applyActiveState(window.location.pathname);

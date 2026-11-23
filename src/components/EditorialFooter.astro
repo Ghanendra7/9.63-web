@@ -1,0 +1,424 @@
+---
+interface Props {
+  previewImage?: string;
+}
+
+const { previewImage = "/placeholders/pd10.png" } = Astro.props;
+
+const services = [
+  "Brand Positioning",
+  "Brand Architecture",
+  "Visual Identity Development",
+  "Art Direction",
+  "Print",
+  "Digital",
+];
+
+const press = [
+  "Visual Journal",
+  "Visuelle",
+  "Contemporary Type",
+  "Klikkentheke",
+  "Creative Circle Awards",
+  "Design Everywhere",
+];
+---
+
+<footer class="editorial-footer" id="editorial-footer">
+  <div class="footer-layout desktop-only">
+    <div class="footer-left">
+      <div class="columns-grid">
+        <div class="footer-col">
+          <p class="col-title">Services</p>
+          <ul class="col-list">
+            {services.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="col-title">Press & Features</p>
+          <ul class="col-list">
+            {press.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="col-title">Social</p>
+          <ul class="col-list">
+            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="col-title">Inquiries</p>
+          <ul class="col-list">
+            <li><a href="mailto:info@9-63.com">Email</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="copyright-row">
+        <p>© Copyright, Terms & Conditions, Privacy Policy</p>
+      </div>
+    </div>
+
+    <div class="footer-right">
+      <div class="newsletter-block">
+        <p class="newsletter-heading">
+          Be part of In Another Form. Creative stories, conversations, and perspectives delivered to your inbox.
+        </p>
+
+        <div class="next-drop-indicator">
+          <div class="drop-index-pill" aria-hidden="true">
+            <span>01</span>
+          </div>
+          <div class="drop-meta">
+            <p class="drop-title">Next drop: Lisa Liu</p>
+            <p class="drop-status">Coming soon</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="drop-preview-frame">
+        <div class="preview-inner">
+          <img src={previewImage} alt="Next drop issue preview" class="preview-img" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-layout mobile-only">
+    <div class="mobile-hero">
+      <p class="newsletter-heading">
+        Be part of In Another Form. Creative stories, conversations, and perspectives delivered to your inbox.
+      </p>
+
+      <div class="drop-preview-frame">
+        <div class="preview-inner">
+          <img src={previewImage} alt="Next drop issue preview" class="preview-img" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="next-drop-indicator">
+        <div class="drop-index-pill" aria-hidden="true">
+          <span>01</span>
+        </div>
+        <div class="drop-meta">
+          <p class="drop-title">Next drop: Lisa Liu</p>
+          <p class="drop-status">Coming soon</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-info-section">
+      <div class="mobile-studio-address">
+        <p class="address-title">9. 63</p>
+        <p class="address-lines">400 Fifth Avenue, New York<br />NY 10018, USA</p>
+      </div>
+
+      <div class="mobile-links-grid">
+        <div class="footer-col">
+          <p class="col-title">Services</p>
+          <ul class="col-list">
+            {services.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="col-title">Press & Features</p>
+          <ul class="col-list">
+            {press.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      <div class="mobile-social-row">
+        <div class="footer-col">
+          <p class="col-title">Social</p>
+          <ul class="col-list">
+            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="col-title">Inquiries</p>
+          <ul class="col-list">
+            <li><a href="mailto:info@9-63.com">Email</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="copyright-row">
+        <p>© Copyright, Terms & Conditions, Privacy Policy</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .editorial-footer {
+    width: 100%;
+    margin-top: 60px;
+    padding-top: 60px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .desktop-only {
+    display: flex;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  .footer-layout {
+    display: flex;
+    gap: 39px;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .footer-left {
+    flex: 1 1 0%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 355px;
+  }
+
+  .columns-grid {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 31px;
+    align-items: flex-start;
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .col-title {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-muted);
+    margin-bottom: 2px;
+  }
+
+  .col-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .col-list li {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+  }
+
+  .col-list a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .col-list a:hover {
+    color: var(--color-text-muted);
+  }
+
+  .copyright-row {
+    margin-top: auto;
+    padding-top: 30px;
+  }
+
+  .copyright-row p {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+  }
+
+  .footer-right {
+    flex: 1 1 0%;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .newsletter-block {
+    flex: 1 1 0%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 316px;
+    padding-top: 11px;
+  }
+
+  .newsletter-heading {
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: 0.54px;
+    color: var(--color-text-primary);
+    max-width: 380px;
+  }
+
+  .next-drop-indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  .drop-index-pill {
+    width: 22px;
+    height: 20px;
+    border-radius: var(--radius-card);
+    background-color: var(--color-pill-frame);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .drop-index-pill span {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+  }
+
+  .drop-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .drop-title {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+  }
+
+  .drop-status {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-muted);
+  }
+
+  .drop-preview-frame {
+    width: 278px;
+    height: 316px;
+    border-radius: 15px;
+    background-color: var(--color-pill-frame);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    flex-shrink: 0;
+  }
+
+  .preview-inner {
+    width: 211px;
+    height: 265px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px;
+  }
+
+  .preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 900px) {
+    .desktop-only {
+      display: none !important;
+    }
+
+    .mobile-only {
+      display: flex !important;
+      flex-direction: column;
+    }
+
+    .mobile-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 50px;
+    }
+
+    .mobile-hero .newsletter-heading {
+      font-size: 15px;
+      line-height: 1.2;
+      letter-spacing: 0.45px;
+      max-width: 100%;
+    }
+
+    .mobile-hero .drop-preview-frame {
+      width: 100%;
+      max-width: 380px;
+      height: 285px;
+    }
+
+    .mobile-hero .next-drop-indicator {
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .mobile-info-section {
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+    }
+
+    .mobile-studio-address {
+      display: flex;
+      flex-direction: column;
+      gap: 31px;
+    }
+
+    .address-title {
+      font-size: 12px;
+      line-height: 17px;
+      letter-spacing: 0.72px;
+      color: var(--color-text-primary);
+    }
+
+    .address-lines {
+      font-size: 12px;
+      line-height: 17px;
+      letter-spacing: 0.72px;
+      color: var(--color-text-primary);
+    }
+
+    .mobile-links-grid {
+      display: flex;
+      gap: 20px;
+    }
+
+    .mobile-social-row {
+      display: flex;
+      gap: 128px;
+    }
+
+    .mobile-info-section .col-title,
+    .mobile-info-section .col-list li,
+    .mobile-info-section .copyright-row p {
+      font-size: 12px;
+      line-height: 17px;
+      letter-spacing: 0.72px;
+    }
+  }
+</style>

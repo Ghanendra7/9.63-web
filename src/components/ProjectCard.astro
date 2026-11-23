@@ -1,0 +1,358 @@
+---
+import type { Project } from "../types/project";
+import { urlFor } from "../lib/sanity";
+
+interface Props {
+  project: Project;
+  index: number;
+  totalProjects?: number;
+}
+
+const { project, index, totalProjects = 16 } = Astro.props;
+
+const SIZES = ["small", "large", "medium", "small", "medium", "large"] as const;
+const sizeVariant = SIZES[index % SIZES.length];
+
+const coverUrl = project.coverImage?.asset?.url || (project.coverImage ? urlFor(project.coverImage).width(1200).auto("format").url() : `/placeholders/pd${(index % 8) + 1}.png`);
+const galleryUrl = project.gallery?.[0]?.asset?.url || (project.gallery?.[0] ? urlFor(project.gallery[0]).width(1200).auto("format").url() : null);
+
+const projectOrder = index + 1;
+const projectNum = String(projectOrder).padStart(2, "0");
+const projectFraction = `${projectOrder}/${totalProjects}`;
+const slug = project.slug?.current || `project-${projectNum}`;
+---
+
+<article
+  class={`project-card size-${sizeVariant} ${project.comingSoon ? "is-coming-soon" : ""}`}
+  data-project-id={project._id}
+  data-index={index}
+  aria-label={`Project ${projectNum}: ${project.title} — ${project.client || ""}`}
+>
+  <div class="card-inner">
+    <div class="card-left-meta" aria-hidden="true">
+      <span class="slide-count">{projectFraction}</span>
+    </div>
+
+    <div class="card-media-wrapper">
+      <a href={`/project/${slug}`} class="media-link" tabindex="0">
+        <div class="media-container">
+          <img
+            src={coverUrl}
+            alt={project.coverImage?.alt || project.title}
+            class="media-image primary-image"
+            loading={index < 2 ? "eager" : "lazy"}
+            decoding="async"
+          />
+          {galleryUrl && (
+            <img
+              src={galleryUrl}
+              alt={`${project.title} slide 2`}
+              class="media-image secondary-image"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+
+          {project.comingSoon && (
+            <div class="coming-soon-badge" aria-label="Coming Soon">
+              <span>Coming Soon</span>
+            </div>
+          )}
+
+          <div class="media-dots-indicator" aria-hidden="true">
+            <span class="indicator-dot active-dot" />
+            <span class="indicator-dot secondary-dot" />
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="card-info">
+      <div class="info-pill-group">
+        <div class="index-pill" aria-hidden="true">
+          <span>{projectNum}</span>
+        </div>
+        <div class="title-group">
+          <a href={`/project/${slug}`} class="title-link">
+            <span class="project-title">{project.title}</span>
+            {project.client && <span class="project-client">{project.client}</span>}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .project-card {
+    width: 100%;
+    margin-bottom: 39px;
+  }
+
+  .card-inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .card-left-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 6px;
+    flex-shrink: 0;
+    width: 42px;
+  }
+
+  .slide-count {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .card-media-wrapper {
+    position: relative;
+    border-radius: var(--radius-card);
+    flex-shrink: 0;
+  }
+
+  .media-link {
+    display: block;
+    text-decoration: none;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  .media-container {
+    position: relative;
+    aspect-ratio: 2500 / 3112;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background-color: rgba(240, 240, 240, 0.4);
+  }
+
+  .media-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-card);
+    transition: opacity 0.4s var(--ease-nav), transform 0.6s var(--ease-expo);
+    pointer-events: none;
+  }
+
+  .primary-image {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .secondary-image {
+    opacity: 0;
+    z-index: 2;
+  }
+
+  .media-container:hover .primary-image {
+    transform: scale(1.02);
+  }
+
+  .media-container:hover .secondary-image {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  .coming-soon-badge {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 3;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: var(--radius-pill-sm);
+    background-color: var(--color-pill-frame);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .coming-soon-badge span {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+  }
+
+  .media-dots-indicator {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    pointer-events: none;
+  }
+
+  .indicator-dot {
+    width: 10.5px;
+    height: 10.5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background-color 0.25s ease;
+  }
+
+  .active-dot {
+    background-color: var(--color-text-primary);
+  }
+
+  .secondary-dot {
+    background-color: transparent;
+    border: 1px solid var(--color-text-muted);
+  }
+
+  .card-info {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding-bottom: 2px;
+  }
+
+  .info-pill-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .index-pill {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-pill-sm);
+    background-color: var(--color-pill-frame);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-muted);
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .title-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .title-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    text-decoration: none;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    white-space: nowrap;
+  }
+
+  .project-title {
+    color: var(--color-text-primary);
+    transition: color 0.2s ease;
+  }
+
+  .project-client {
+    color: var(--color-text-muted);
+    transition: color 0.2s ease;
+  }
+
+  .title-link:hover .project-title {
+    color: #444444;
+  }
+
+  .size-small .card-media-wrapper {
+    width: 207px;
+  }
+
+  .size-medium .card-media-wrapper {
+    width: 419px;
+  }
+
+  .size-large .card-media-wrapper {
+    width: 628px;
+  }
+
+  @media (max-width: 900px) {
+    .size-small .card-media-wrapper,
+    .size-medium .card-media-wrapper,
+    .size-large .card-media-wrapper {
+      width: 100%;
+      max-width: 480px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .project-card {
+      margin-bottom: 24px;
+    }
+
+    .card-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .card-left-meta {
+      display: none;
+    }
+
+    .size-small .card-media-wrapper {
+      width: 108px;
+      max-width: 100%;
+    }
+
+    .size-medium .card-media-wrapper {
+      width: 218px;
+      max-width: 100%;
+    }
+
+    .size-large .card-media-wrapper {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .index-pill {
+      width: 25px;
+      height: 25px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .title-link {
+      font-size: 12px;
+      gap: 5px;
+    }
+
+    .project-title,
+    .project-client {
+      font-size: 12px;
+      letter-spacing: 0.72px;
+    }
+
+    .coming-soon-badge span {
+      font-size: 12px;
+    }
+  }
+</style>
