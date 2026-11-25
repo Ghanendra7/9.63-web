@@ -1,5 +1,5 @@
 ---
-import type { Project } from "../types/project";
+import type { Project, ProjectImage } from "../types/project";
 import { urlFor } from "../lib/sanity";
 
 interface Props {
@@ -13,13 +13,32 @@ const { project, index, totalProjects = 16 } = Astro.props;
 const SIZES = ["small", "large", "medium", "small", "medium", "large"] as const;
 const sizeVariant = SIZES[index % SIZES.length];
 
-const coverUrl = project.coverImage?.asset?.url || (project.coverImage ? urlFor(project.coverImage).width(1200).auto("format").url() : `/placeholders/pd${(index % 8) + 1}.png`);
-const galleryUrl = project.gallery?.[0]?.asset?.url || (project.gallery?.[0] ? urlFor(project.gallery[0]).width(1200).auto("format").url() : null);
+// Extract all images
+const rawImages: ProjectImage[] =
+  project.images && project.images.length > 0
+    ? project.images
+    : ([project.coverImage, ...(project.gallery || [])].filter(
+        Boolean,
+      ) as ProjectImage[]);
+
+const images: ProjectImage[] =
+  rawImages.length > 0
+    ? rawImages
+    : [
+        {
+          asset: { url: `/placeholders/pd${(index % 8) + 1}.png` },
+          alt: project.title,
+        },
+      ];
+
+const hasMultipleImages = images.length > 1;
 
 const projectOrder = index + 1;
 const projectNum = String(projectOrder).padStart(2, "0");
 const projectFraction = `${projectOrder}/${totalProjects}`;
-const slug = project.slug?.current || `project-${projectNum}`;
+const slug =
+  (typeof project.slug === "object" ? project.slug?.current : project.slug) ||
+  `project-${projectNum}`;
 ---
 
 <article
@@ -33,25 +52,37 @@ const slug = project.slug?.current || `project-${projectNum}`;
       <span class="slide-count">{projectFraction}</span>
     </div>
 
-    <div class="card-media-wrapper">
-      <a href={`/project/${slug}`} class="media-link" tabindex="0">
+    <div
+      class="card-media-wrapper"
+      data-project-media
+      data-total-slides={images.length}
+    >
+      <div class="media-link">
         <div class="media-container">
-          <img
-            src={coverUrl}
-            alt={project.coverImage?.alt || project.title}
-            class="media-image primary-image"
-            loading={index < 2 ? "eager" : "lazy"}
-            decoding="async"
-          />
-          {galleryUrl && (
-            <img
-              src={galleryUrl}
-              alt={`${project.title} slide 2`}
-              class="media-image secondary-image"
-              loading="lazy"
-              decoding="async"
-            />
-          )}
+          {images.map((img, imgIndex) => {
+            const hasAsset = Boolean(img.asset?._id || img.asset?._ref);
+            const imgUrl = hasAsset
+              ? urlFor(img).width(1200).auto("format").url()
+              : img.asset?.url || "";
+
+            const focalX =
+              img.hotspot?.x != null ? Math.round(img.hotspot.x * 100) : 50;
+            const focalY =
+              img.hotspot?.y != null ? Math.round(img.hotspot.y * 100) : 50;
+            const objectPosition = `${focalX}% ${focalY}%`;
+
+            return (
+              <img
+                src={imgUrl}
+                alt={img.alt || `${project.title} slide ${imgIndex + 1}`}
+                class={`media-image slide-image ${imgIndex === 0 ? "is-active" : ""}`}
+                data-slide-index={imgIndex}
+                style={`object-position: ${objectPosition};`}
+                loading={index < 2 && imgIndex === 0 ? "eager" : "lazy"}
+                decoding="async"
+              />
+            );
+          })}
 
           {project.comingSoon && (
             <div class="coming-soon-badge" aria-label="Coming Soon">
@@ -59,12 +90,23 @@ const slug = project.slug?.current || `project-${projectNum}`;
             </div>
           )}
 
-          <div class="media-dots-indicator" aria-hidden="true">
-            <span class="indicator-dot active-dot" />
-            <span class="indicator-dot secondary-dot" />
-          </div>
+          {hasMultipleImages && (
+            <div
+              class="media-dots-indicator"
+              aria-label="Project images navigation"
+            >
+              {images.map((_, dotIndex) => (
+                <button
+                  type="button"
+                  class={`indicator-dot ${dotIndex === 0 ? "is-active" : ""}`}
+                  data-dot-index={dotIndex}
+                  aria-label={`Go to slide ${dotIndex + 1} of ${images.length}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      </a>
+      </div>
     </div>
 
     <div class="card-info">
@@ -73,10 +115,12 @@ const slug = project.slug?.current || `project-${projectNum}`;
           <span>{projectNum}</span>
         </div>
         <div class="title-group">
-          <a href={`/project/${slug}`} class="title-link">
+          <div class="title-link">
             <span class="project-title">{project.title}</span>
-            {project.client && <span class="project-client">{project.client}</span>}
-          </a>
+            {project.client && (
+              <span class="project-client">{project.client}</span>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -85,8 +129,28 @@ const slug = project.slug?.current || `project-${projectNum}`;
 
 <style>
   .project-card {
+    --card-media-width: 207px;
     width: 100%;
-    margin-bottom: 39px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .project-card:hover,
+  .project-card:focus-within {
+    z-index: 2;
+  }
+
+  .size-small {
+    --card-media-width: 207px;
+  }
+
+  .size-medium {
+    --card-media-width: 419px;
+  }
+
+  .size-large {
+    --card-media-width: 628px;
   }
 
   .card-inner {
@@ -120,21 +184,38 @@ const slug = project.slug?.current || `project-${projectNum}`;
     position: relative;
     border-radius: var(--radius-card);
     flex-shrink: 0;
+    width: var(--card-media-width);
+    aspect-ratio: 3 / 4;
+    transition: width 0.5s var(--ease-expo);
+    will-change: width;
+    touch-action: pan-y;
+  }
+
+  .card-media-wrapper:hover,
+  .card-media-wrapper:focus-within {
+    width: calc(var(--card-media-width) * 1.2);
   }
 
   .media-link {
     display: block;
+    width: 100%;
+    height: 100%;
     text-decoration: none;
     border-radius: var(--radius-card);
     overflow: hidden;
+    touch-action: pan-y;
   }
 
   .media-container {
     position: relative;
-    aspect-ratio: 2500 / 3112;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 3 / 4;
     border-radius: var(--radius-card);
     overflow: hidden;
     background-color: rgba(240, 240, 240, 0.4);
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    touch-action: pan-y;
   }
 
   .media-image {
@@ -144,27 +225,18 @@ const slug = project.slug?.current || `project-${projectNum}`;
     height: 100%;
     object-fit: cover;
     border-radius: var(--radius-card);
-    transition: opacity 0.4s var(--ease-nav), transform 0.6s var(--ease-expo);
-    pointer-events: none;
-  }
-
-  .primary-image {
-    opacity: 1;
-    z-index: 1;
-  }
-
-  .secondary-image {
     opacity: 0;
-    z-index: 2;
+    transition: opacity 0.4s var(--ease-nav);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
-  .media-container:hover .primary-image {
-    transform: scale(1.02);
-  }
-
-  .media-container:hover .secondary-image {
+  .media-image.is-active {
     opacity: 1;
-    transform: scale(1.02);
+    z-index: 2;
   }
 
   .coming-soon-badge {
@@ -197,11 +269,10 @@ const slug = project.slug?.current || `project-${projectNum}`;
     left: 50%;
     transform: translateX(-50%);
     bottom: 10px;
-    z-index: 3;
+    z-index: 4;
     display: flex;
     align-items: center;
     gap: 7px;
-    pointer-events: none;
   }
 
   .indicator-dot {
@@ -209,16 +280,16 @@ const slug = project.slug?.current || `project-${projectNum}`;
     height: 10.5px;
     border-radius: 50%;
     flex-shrink: 0;
+    background-color: #828282;
+    border: none;
+    padding: 0;
+    cursor: pointer;
     transition: background-color 0.25s ease;
+    pointer-events: auto;
   }
 
-  .active-dot {
-    background-color: var(--color-text-primary);
-  }
-
-  .secondary-dot {
-    background-color: transparent;
-    border: 1px solid var(--color-text-muted);
+  .indicator-dot.is-active {
+    background-color: #bcbcbc;
   }
 
   .card-info {
@@ -282,77 +353,212 @@ const slug = project.slug?.current || `project-${projectNum}`;
     color: #444444;
   }
 
-  .size-small .card-media-wrapper {
-    width: 207px;
-  }
-
-  .size-medium .card-media-wrapper {
-    width: 419px;
-  }
-
-  .size-large .card-media-wrapper {
-    width: 628px;
-  }
-
   @media (max-width: 900px) {
-    .size-small .card-media-wrapper,
-    .size-medium .card-media-wrapper,
-    .size-large .card-media-wrapper {
-      width: 100%;
-      max-width: 480px;
+    .size-small,
+    .size-medium,
+    .size-large {
+      --card-media-width: 480px;
+    }
+
+    .card-media-wrapper {
+      max-width: 100%;
     }
   }
 
   @media (max-width: 768px) {
     .project-card {
-      margin-bottom: 24px;
+      margin-bottom: 10px;
     }
 
     .card-inner {
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 5px;
     }
 
     .card-left-meta {
       display: none;
     }
 
-    .size-small .card-media-wrapper {
-      width: 108px;
-      max-width: 100%;
+    .size-small {
+      --card-media-width: 108px;
     }
 
-    .size-medium .card-media-wrapper {
-      width: 218px;
-      max-width: 100%;
+    .size-medium {
+      --card-media-width: 218px;
     }
 
-    .size-large .card-media-wrapper {
-      width: 100%;
-      max-width: 380px;
+    .size-large {
+      --card-media-width: 380px;
+    }
+
+    .card-media-wrapper {
+      max-width: 100%;
     }
 
     .index-pill {
       width: 25px;
       height: 25px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: var(--text-size);
     }
 
     .title-link {
-      font-size: 12px;
+      font-size: var(--text-size);
       gap: 5px;
     }
 
     .project-title,
     .project-client {
-      font-size: 12px;
-      letter-spacing: 0.72px;
+      font-size: var(--text-size);
+      letter-spacing: var(--text-tracking);
     }
 
     .coming-soon-badge span {
-      font-size: 12px;
+      font-size: var(--text-size);
     }
   }
 </style>
+
+<script>
+  function initProjectGalleries() {
+    const wrappers = document.querySelectorAll<HTMLElement>(
+      "[data-project-media]",
+    );
+
+    wrappers.forEach((wrapper) => {
+      if ((wrapper as any).__galleryInit) return;
+      (wrapper as any).__galleryInit = true;
+
+      const slides = wrapper.querySelectorAll<HTMLElement>(".slide-image");
+      const dots =
+        wrapper.querySelectorAll<HTMLButtonElement>(".indicator-dot");
+      const total = slides.length;
+      if (total <= 1) return;
+
+      let currentIdx = 0;
+
+      function setSlide(idx: number) {
+        currentIdx = idx;
+        slides.forEach((slide, i) => {
+          if (i === idx) {
+            slide.classList.add("is-active");
+          } else {
+            slide.classList.remove("is-active");
+          }
+        });
+        dots.forEach((dot, i) => {
+          if (i === idx) {
+            dot.classList.add("is-active");
+          } else {
+            dot.classList.remove("is-active");
+          }
+        });
+      }
+
+      dots.forEach((dot) => {
+        const dotIdx = Number(dot.dataset.dotIndex ?? 0);
+
+        dot.addEventListener("mouseenter", (e) => {
+          e.stopPropagation();
+          setSlide(dotIdx);
+        });
+
+        dot.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setSlide(dotIdx);
+        });
+      });
+
+      // Desktop: Reset slide on mouse leave if device supports hover
+      wrapper.addEventListener("mouseleave", () => {
+        if (window.matchMedia("(hover: hover)").matches) {
+          setSlide(0);
+        }
+      });
+
+      // Touch: Swipe left/right to navigate images
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchEndX = 0;
+      let touchEndY = 0;
+      let isSwiping = false;
+
+      wrapper.addEventListener(
+        "touchstart",
+        (e: TouchEvent) => {
+          if (e.touches.length !== 1) return;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          touchEndX = touchStartX;
+          touchEndY = touchStartY;
+          isSwiping = false;
+        },
+        { passive: true },
+      );
+
+      wrapper.addEventListener(
+        "touchmove",
+        (e: TouchEvent) => {
+          if (e.touches.length !== 1) return;
+          touchEndX = e.touches[0].clientX;
+          touchEndY = e.touches[0].clientY;
+          const diffX = touchEndX - touchStartX;
+          const diffY = touchEndY - touchStartY;
+
+          // Flag as swiping if horizontal intent is clear
+          if (Math.abs(diffX) > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+            isSwiping = true;
+          }
+        },
+        { passive: true },
+      );
+
+      wrapper.addEventListener(
+        "touchend",
+        () => {
+          if (!isSwiping) return;
+
+          const diffX = touchEndX - touchStartX;
+          const diffY = touchEndY - touchStartY;
+          const minSwipeDistance = 30; // px threshold
+
+          if (
+            Math.abs(diffX) > minSwipeDistance &&
+            Math.abs(diffX) > Math.abs(diffY)
+          ) {
+            if (diffX < 0) {
+              // Swipe left -> next image
+              setSlide(Math.min(total - 1, currentIdx + 1));
+            } else {
+              // Swipe right -> previous image
+              setSlide(Math.max(0, currentIdx - 1));
+            }
+          }
+
+          isSwiping = false;
+        },
+        { passive: true },
+      );
+    });
+  }
+
+  if (typeof window !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initProjectGalleries);
+    } else {
+      initProjectGalleries();
+    }
+    document.addEventListener("astro:page-load", initProjectGalleries);
+    window.addEventListener("feed-view-change", () => {
+      setTimeout(initProjectGalleries, 50);
+    });
+
+    import("@barba/core")
+      .then((m) => {
+        m.default?.hooks?.after(initProjectGalleries);
+      })
+      .catch(() => {});
+  }
+</script>

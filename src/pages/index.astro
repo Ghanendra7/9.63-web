@@ -51,15 +51,27 @@ const MOBILE_SLOTS = [
 
 <Layout title="9.63 — Studio" namespace="home">
   <div class="home-container" id="home-feed-root">
-    <section class={`feed-1col ${!isInitialMulti ? "is-active" : "is-hidden"}`} id="feed-1col" aria-label="1 Column Project Feed">
+    <section
+      class={`feed-1col ${!isInitialMulti ? "is-active" : "is-hidden"}`}
+      id="feed-1col"
+      aria-label="1 Column Project Feed"
+    >
       <div class="feed-1col-inner">
         {projects.map((project, index) => (
-          <ProjectCard project={project} index={index} totalProjects={projects.length} />
+          <ProjectCard
+            project={project}
+            index={index}
+            totalProjects={projects.length}
+          />
         ))}
       </div>
     </section>
 
-    <section class={`feed-constellation ${isInitialMulti ? "is-active" : "is-hidden"}`} id="feed-constellation" aria-label="Constellation Project Grid">
+    <section
+      class={`feed-constellation ${isInitialMulti ? "is-active" : "is-hidden"}`}
+      id="feed-constellation"
+      aria-label="Constellation Project Grid"
+    >
       <div class="constellation-grid" id="constellation-grid">
         {projects.map((project, index) => {
           const dSlot = DESKTOP_SLOTS[index % DESKTOP_SLOTS.length];
@@ -90,8 +102,7 @@ const MOBILE_SLOTS = [
   .home-container {
     width: 100%;
     min-height: 100dvh;
-    padding-top: calc(var(--header-top) + var(--header-height) + 50px);
-    padding-bottom: 80px;
+    padding-bottom: 30px;
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
     max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
@@ -122,12 +133,24 @@ const MOBILE_SLOTS = [
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 2px;
+    padding-top: 130px;
     width: 100%;
+  }
+
+  @media (hover: hover) {
+    .constellation-grid:has(:global(.constellation-card:hover))
+      :global(.constellation-card) {
+      opacity: 0.2;
+    }
+
+    .constellation-grid:has(:global(.constellation-card:hover))
+      :global(.constellation-card:hover) {
+      opacity: 1;
+    }
   }
 
   .feed-footer-wrapper {
     width: 100%;
-    margin-top: 40px;
   }
 
   .is-hidden {
@@ -142,7 +165,6 @@ const MOBILE_SLOTS = [
 
   @media (max-width: 768px) {
     .home-container {
-      padding-top: calc(var(--header-top) + var(--header-height) + 20px);
       padding-left: 10px;
       padding-right: 10px;
       padding-bottom: 60px;
@@ -151,10 +173,12 @@ const MOBILE_SLOTS = [
     .constellation-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 3px;
+      padding-top: 2px;
     }
 
     .feed-1col-inner {
       max-width: 100%;
+      padding-top: 48px;
     }
   }
 </style>
@@ -168,7 +192,10 @@ const MOBILE_SLOTS = [
 
     if (!feed1Col || !feedConstellation) return;
 
-    let currentMode = new URLSearchParams(window.location.search).get("view") || sessionStorage.getItem("feed_view_mode") || "1";
+    let currentMode =
+      new URLSearchParams(window.location.search).get("view") ||
+      sessionStorage.getItem("feed_view_mode") ||
+      "1";
 
     function setViewMode(mode: string, animate = true) {
       currentMode = mode;
@@ -210,7 +237,7 @@ const MOBILE_SLOTS = [
                       (window as any).__lenis.resize();
                     }
                   },
-                }
+                },
               );
             },
           });
@@ -244,7 +271,7 @@ const MOBILE_SLOTS = [
                       (window as any).__lenis.resize();
                     }
                   },
-                }
+                },
               );
             },
           });
@@ -258,7 +285,9 @@ const MOBILE_SLOTS = [
       }
     }
 
-    window.addEventListener("feed-view-change", ((e: CustomEvent<{ mode: string }>) => {
+    window.addEventListener("feed-view-change", ((
+      e: CustomEvent<{ mode: string }>,
+    ) => {
       if (e.detail?.mode) {
         setViewMode(e.detail.mode, true);
       }

@@ -20,38 +20,9 @@ export const projectType = defineType({
       type: "string",
     }),
     defineField({
-      name: "slug",
-      title: "Slug",
-      type: "slug",
-      options: {
-        source: "title",
-        maxLength: 96,
-      },
-    }),
-    defineField({
-      name: "comingSoon",
-      title: "Coming Soon",
-      type: "boolean",
-      initialValue: false,
-    }),
-    defineField({
-      name: "coverImage",
-      title: "Cover Image",
-      type: "image",
-      options: {
-        hotspot: true,
-      },
-      fields: [
-        defineField({
-          name: "alt",
-          title: "Alternative Text",
-          type: "string",
-        }),
-      ],
-    }),
-    defineField({
-      name: "gallery",
-      title: "Gallery Slides",
+      name: "images",
+      title: "Project Images",
+      description: "The first image is the cover (used in 8-column view). Additional images become gallery slides browsable via dots in the 1-column view.",
       type: "array",
       of: [
         {
@@ -66,37 +37,40 @@ export const projectType = defineType({
           ],
         },
       ],
+      options: {
+        layout: "grid",
+      },
+      validation: (rule) => rule.min(1).error("Add at least 1 image"),
     }),
     defineField({
-      name: "slideCount",
-      title: "Slide Count Display",
-      type: "string",
-      initialValue: "1/10",
+      name: "comingSoon",
+      title: "Coming Soon",
+      type: "boolean",
+      initialValue: false,
     }),
     defineField({
-      name: "year",
-      title: "Year",
-      type: "string",
-      initialValue: "2026",
-    }),
-    defineField({
-      name: "services",
-      title: "Services",
-      type: "array",
-      of: [{ type: "string" }],
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: {
+        source: "title",
+        maxLength: 96,
+      },
+      hidden: true,
     }),
   ],
   preview: {
     select: {
       title: "title",
       subtitle: "client",
-      media: "coverImage",
+      media: "images.0",
+      fallbackMedia: "coverImage",
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ title, subtitle, media, fallbackMedia }) {
       return {
         title: title || "Untitled",
         subtitle: subtitle || "",
-        media,
+        media: media || fallbackMedia,
       };
     },
   },

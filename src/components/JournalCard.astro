@@ -1,0 +1,442 @@
+---
+import type { JournalEntry } from "../types/journal";
+import { urlFor } from "../lib/sanity";
+
+interface Props {
+  entry: JournalEntry;
+  index: number;
+  totalEntries: number;
+}
+
+const { entry, index, totalEntries } = Astro.props;
+
+const images = (entry.images && entry.images.length > 0)
+  ? entry.images
+  : [
+      {
+        asset: { url: `/placeholders/pd${(index % 8) + 1}.png` },
+        alt: entry.title,
+      },
+    ];
+
+const totalSlides = images.length;
+const hasMultipleImages = totalSlides > 1;
+const displayNumber = entry.entryNumber || String(totalEntries - index).padStart(2, "0");
+const isAccentCategory = entry.category === "In Another Form";
+
+const resolvedImages = images.map((img, imgIndex) => {
+  const hasAsset = Boolean(img.asset?._id || img.asset?._ref);
+  const src = hasAsset
+    ? urlFor(img).width(1200).auto("format").url()
+    : img.asset?.url || "";
+  const focalX = img.hotspot?.x != null ? Math.round(img.hotspot.x * 100) : 50;
+  const focalY = img.hotspot?.y != null ? Math.round(img.hotspot.y * 100) : 50;
+
+  return {
+    src,
+    alt: img.alt || `${entry.title} — image ${imgIndex + 1}`,
+    objectPosition: `${focalX}% ${focalY}%`,
+  };
+});
+
+// Initial upcoming thumbnails for desktop infinite slider (slots 1..N-1)
+const initialThumbSlots = hasMultipleImages
+  ? Array.from({ length: Math.min(totalSlides - 1, 4) }, (_, offset) => {
+      const targetIdx = (offset + 1) % totalSlides;
+      return {
+        offset: offset + 1,
+        targetIdx,
+        counter: `${targetIdx + 1}/${totalSlides}`,
+        ...resolvedImages[targetIdx],
+      };
+    })
+  : [];
+---
+
+<article
+  class="journal-card"
+  data-journal-card
+  data-category={entry.category}
+  data-journal-id={entry._id}
+  data-total-slides={totalSlides}
+>
+  <div class="journal-col-left">
+    <div class="journal-number" aria-label={`Entry ${displayNumber}`}>
+      <span>{displayNumber}</span>
+    </div>
+
+    <div class="journal-copy">
+      <h2 class="journal-title">{entry.title}</h2>
+      <p class="journal-excerpt">{entry.excerpt}</p>
+    </div>
+  </div>
+
+  <div class="journal-col-right">
+    <div class="journal-category-wrap">
+      <span class={`journal-category-tag ${isAccentCategory ? "is-accent" : ""}`}>
+        {entry.category}
+      </span>
+    </div>
+
+    <div class="journal-media-stage">
+      <div class="journal-active-group">
+        <div class="journal-active-frame" data-active-frame>
+          {resolvedImages.map((img, imgIdx) => (
+            <img
+              src={img.src}
+              alt={img.alt}
+              class={`journal-slide-img ${imgIdx === 0 ? "is-active" : ""}`}
+              data-slide-index={imgIdx}
+              style={`object-position: ${img.objectPosition};`}
+              loading={index < 2 && imgIdx === 0 ? "eager" : "lazy"}
+              decoding="async"
+            />
+          ))}
+        </div>
+
+        <span class="journal-counter journal-active-counter" data-active-counter>
+          1/{totalSlides}
+        </span>
+      </div>
+
+      {hasMultipleImages && (
+        <div class="journal-thumbs-viewport" aria-label="Upcoming journal images">
+          <div class="journal-thumbs-track" data-thumbs-track>
+            {initialThumbSlots.map((slot) => (
+              <div class="journal-thumb-item" data-thumb-offset={slot.offset}>
+                <button
+                  type="button"
+                  class="journal-thumb-btn"
+                  aria-label={`View image ${slot.targetIdx + 1} of ${totalSlides}`}
+                >
+                  <img
+                    src={slot.src}
+                    alt={slot.alt}
+                    class="journal-thumb-img"
+                    style={`object-position: ${slot.objectPosition};`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </button>
+                <span class="journal-counter journal-thumb-counter" data-thumb-counter>
+                  {slot.counter}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+
+    {hasMultipleImages && (
+      <div class="journal-mobile-dots" aria-label="Slide pagination">
+        {resolvedImages.map((_, dotIdx) => (
+          <button
+            type="button"
+            class={`journal-dot ${dotIdx === 0 ? "is-active" : ""}`}
+            data-dot-index={dotIdx}
+            aria-label={`Go to image ${dotIdx + 1} of ${totalSlides}`}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</article>
+
+<style>
+  .journal-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .journal-card.is-filtered-out {
+    display: none;
+  }
+
+  .journal-col-left {
+    display: grid;
+    grid-template-columns: minmax(48px, 21%) minmax(0, 1fr);
+    gap: 16px;
+    align-items: flex-start;
+    padding-right: 48px;
+  }
+
+  .journal-number {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    user-select: none;
+  }
+
+  .journal-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+  }
+
+  .journal-title {
+    font-size: var(--text-size);
+    font-weight: 500;
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .journal-excerpt {
+    font-size: var(--text-size);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: var(--text-tracking);
+    color: rgba(0, 0, 0, 0.55);
+    margin: 0;
+  }
+
+  .journal-col-right {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .journal-category-wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+  }
+
+  .journal-category-tag {
+    height: 24px;
+    padding: 0 11px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-pill-light);
+    color: rgba(0, 0, 0, 0.42);
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .journal-category-tag.is-accent {
+    background-color: rgba(235, 87, 87, 0.12);
+    color: #e05252;
+  }
+
+  .journal-media-stage {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .journal-active-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .journal-active-frame {
+    width: clamp(230px, 24vw, 355px);
+    aspect-ratio: 1 / 1.02;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    position: relative;
+    background-color: rgba(240, 240, 240, 0.4);
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    touch-action: pan-y;
+  }
+
+  .journal-slide-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-card);
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: opacity 0.35s var(--ease-nav);
+  }
+
+  .journal-slide-img.is-active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .journal-counter {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    user-select: none;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .journal-thumbs-viewport {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .journal-thumbs-track {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    will-change: transform;
+  }
+
+  .journal-thumb-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .journal-thumb-btn {
+    width: clamp(110px, 11.2vw, 165px);
+    aspect-ratio: 1.15 / 1;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    background-color: rgba(240, 240, 240, 0.4);
+    cursor: pointer;
+    position: relative;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    transition: opacity 0.25s ease;
+  }
+
+  .journal-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s var(--ease-expo);
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .journal-thumb-btn:hover .journal-thumb-img {
+    transform: scale(1.03);
+  }
+
+  .journal-mobile-dots {
+    display: none;
+  }
+
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .journal-col-left {
+      padding-right: 24px;
+    }
+
+    .journal-active-frame {
+      width: clamp(190px, 23vw, 260px);
+    }
+
+    .journal-thumb-btn {
+      width: clamp(92px, 11vw, 130px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .journal-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .journal-col-left,
+    .journal-col-right {
+      display: contents;
+    }
+
+    .journal-media-stage {
+      order: 1;
+      width: 100%;
+      display: block;
+    }
+
+    .journal-active-group {
+      width: 100%;
+      display: block;
+    }
+
+    .journal-active-frame {
+      width: 100%;
+      aspect-ratio: 1 / 1.03;
+    }
+
+    .journal-active-counter,
+    .journal-thumbs-viewport {
+      display: none;
+    }
+
+    .journal-mobile-dots {
+      order: 2;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .journal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #d6d6d6;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .journal-dot.is-active {
+      background-color: #666666;
+    }
+
+    .journal-number {
+      order: 3;
+      margin-top: 14px;
+      height: 22px;
+      min-width: 28px;
+      padding: 0 8px;
+      border-radius: 11px;
+      background-color: var(--color-pill-frame);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+    }
+
+    .journal-copy {
+      order: 4;
+      margin-top: 10px;
+      max-width: 100%;
+      gap: 8px;
+    }
+
+    .journal-category-wrap {
+      position: static;
+      order: 5;
+      margin-top: 12px;
+    }
+  }
+</style>

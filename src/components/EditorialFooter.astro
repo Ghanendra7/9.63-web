@@ -31,28 +31,38 @@ const press = [
         <div class="footer-col">
           <p class="col-title">Services</p>
           <ul class="col-list">
-            {services.map((item) => <li>{item}</li>)}
+            {services.map((item) => (
+              <li>{item}</li>
+            ))}
           </ul>
         </div>
 
         <div class="footer-col">
           <p class="col-title">Press & Features</p>
           <ul class="col-list">
-            {press.map((item) => <li>{item}</li>)}
+            {press.map((item) => (
+              <li>{item}</li>
+            ))}
           </ul>
         </div>
 
         <div class="footer-col">
           <p class="col-title">Social</p>
           <ul class="col-list">
-            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+            <li>
+              <a href="https://instagram.com" target="_blank" rel="noopener">
+                Instagram
+              </a>
+            </li>
           </ul>
         </div>
 
         <div class="footer-col">
           <p class="col-title">Inquiries</p>
           <ul class="col-list">
-            <li><a href="mailto:info@9-63.com">Email</a></li>
+            <li>
+              <a href="mailto:info@9-63.com">Email</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -65,7 +75,8 @@ const press = [
     <div class="footer-right">
       <div class="newsletter-block">
         <p class="newsletter-heading">
-          Be part of In Another Form. Creative stories, conversations, and perspectives delivered to your inbox.
+          Be part of In Another Form. Creative stories, conversations, and
+          perspectives delivered to your inbox.
         </p>
 
         <div class="next-drop-indicator">
@@ -81,7 +92,12 @@ const press = [
 
       <div class="drop-preview-frame">
         <div class="preview-inner">
-          <img src={previewImage} alt="Next drop issue preview" class="preview-img" loading="lazy" />
+          <img
+            src={previewImage}
+            alt="Next drop issue preview"
+            class="preview-img"
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
@@ -90,12 +106,18 @@ const press = [
   <div class="mobile-layout mobile-only">
     <div class="mobile-hero">
       <p class="newsletter-heading">
-        Be part of In Another Form. Creative stories, conversations, and perspectives delivered to your inbox.
+        Be part of In Another Form. Creative stories, conversations, and
+        perspectives delivered to your inbox.
       </p>
 
       <div class="drop-preview-frame">
         <div class="preview-inner">
-          <img src={previewImage} alt="Next drop issue preview" class="preview-img" loading="lazy" />
+          <img
+            src={previewImage}
+            alt="Next drop issue preview"
+            class="preview-img"
+            loading="lazy"
+          />
         </div>
       </div>
 
@@ -113,21 +135,29 @@ const press = [
     <div class="mobile-info-section">
       <div class="mobile-studio-address">
         <p class="address-title">9. 63</p>
-        <p class="address-lines">400 Fifth Avenue, New York<br />NY 10018, USA</p>
+        <p class="address-lines">
+          400 Fifth Avenue, New York
+          <br />
+          NY 10018, USA
+        </p>
       </div>
 
       <div class="mobile-links-grid">
         <div class="footer-col">
           <p class="col-title">Services</p>
           <ul class="col-list">
-            {services.map((item) => <li>{item}</li>)}
+            {services.map((item) => (
+              <li>{item}</li>
+            ))}
           </ul>
         </div>
 
         <div class="footer-col">
           <p class="col-title">Press & Features</p>
           <ul class="col-list">
-            {press.map((item) => <li>{item}</li>)}
+            {press.map((item) => (
+              <li>{item}</li>
+            ))}
           </ul>
         </div>
       </div>
@@ -136,13 +166,19 @@ const press = [
         <div class="footer-col">
           <p class="col-title">Social</p>
           <ul class="col-list">
-            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+            <li>
+              <a href="https://instagram.com" target="_blank" rel="noopener">
+                Instagram
+              </a>
+            </li>
           </ul>
         </div>
         <div class="footer-col">
           <p class="col-title">Inquiries</p>
           <ul class="col-list">
-            <li><a href="mailto:info@9-63.com">Email</a></li>
+            <li>
+              <a href="mailto:info@9-63.com">Email</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -157,9 +193,7 @@ const press = [
 <style>
   .editorial-footer {
     width: 100%;
-    margin-top: 60px;
-    padding-top: 60px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: 32px;
   }
 
   .desktop-only {
@@ -390,16 +424,16 @@ const press = [
     }
 
     .address-title {
-      font-size: 12px;
-      line-height: 17px;
-      letter-spacing: 0.72px;
+      font-size: var(--text-size);
+      line-height: var(--text-leading);
+      letter-spacing: var(--text-tracking);
       color: var(--color-text-primary);
     }
 
     .address-lines {
-      font-size: 12px;
-      line-height: 17px;
-      letter-spacing: 0.72px;
+      font-size: var(--text-size);
+      line-height: var(--text-leading);
+      letter-spacing: var(--text-tracking);
       color: var(--color-text-primary);
     }
 
@@ -416,9 +450,9 @@ const press = [
     .mobile-info-section .col-title,
     .mobile-info-section .col-list li,
     .mobile-info-section .copyright-row p {
-      font-size: 12px;
-      line-height: 17px;
-      letter-spacing: 0.72px;
+      font-size: var(--text-size);
+      line-height: var(--text-leading);
+      letter-spacing: var(--text-tracking);
     }
   }
 </style>

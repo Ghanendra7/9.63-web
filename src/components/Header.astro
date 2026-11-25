@@ -1,4 +1,6 @@
 ---
+import { JOURNAL_CATEGORIES } from "../types/journal";
+
 interface Props {
   currentPath?: string;
 }
@@ -22,6 +24,11 @@ const mobileNavItems = [
 const activeHref = currentPath === "/" || currentPath === "" ? "/approach" : currentPath;
 const activeItem = navItems.find((item) => activeHref === item.href || (item.href !== "/" && activeHref.startsWith(item.href + "/"))) || navItems[0];
 const activeLabel = activeItem.label;
+const isHomePage = currentPath === "/" || currentPath === "";
+const isJournalPage = activeHref === "/journal" || activeHref.startsWith("/journal/");
+
+const journalRow1 = JOURNAL_CATEGORIES.slice(0, 4);
+const journalRow2 = JOURNAL_CATEGORIES.slice(4);
 
 const initialColView = Astro.url.searchParams.get("view") || "1";
 const isCol8 = initialColView === "8";
@@ -61,13 +68,48 @@ const isCol3 = initialColView === "3";
         </button>
       </nav>
 
-      <div class="sub-bar column-switcher" id="column-switcher">
+      <div class={`sub-bar column-switcher ${isHomePage ? "" : "is-hidden"}`} id="column-switcher">
         <button type="button" class={`col-btn ${!isCol8 ? "is-active" : ""}`} data-col="1" aria-label="1 Column view">
           1
         </button>
         <button type="button" class={`col-btn ${isCol8 ? "is-active" : ""}`} data-col="8" aria-label="8 Column view">
           8
         </button>
+      </div>
+
+      <div class={`journal-filters-desktop ${isJournalPage ? "" : "is-hidden"}`} id="journal-filters-desktop" aria-label="Journal Category Filters">
+        <div class="journal-filter-row journal-filter-row-1">
+          <button
+            type="button"
+            class="journal-filter-pill is-all is-active"
+            data-filter="All"
+          >
+            <span class="filter-dot" aria-hidden="true" />
+            <span>All</span>
+          </button>
+          {journalRow1.map((cat) => (
+            <button
+              type="button"
+              class={`journal-filter-pill ${cat === "In Another Form" ? "is-accent" : ""}`}
+              data-filter={cat}
+            >
+              <span class="filter-dot" aria-hidden="true" />
+              <span>{cat}</span>
+            </button>
+          ))}
+        </div>
+        <div class="journal-filter-row journal-filter-row-2">
+          {journalRow2.map((cat) => (
+            <button
+              type="button"
+              class={`journal-filter-pill is-compact ${cat === "In Another Form" ? "is-accent" : ""}`}
+              data-filter={cat}
+            >
+              <span class="filter-dot" aria-hidden="true" />
+              <span>{cat}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   </div>
@@ -88,12 +130,44 @@ const isCol3 = initialColView === "3";
     </div>
 
     <div class="mobile-right">
+      <button
+        type="button"
+        class={`mobile-filter-btn ${isJournalPage ? "" : "is-hidden"}`}
+        id="mobile-journal-filter-btn"
+        aria-expanded="false"
+        aria-controls="mobile-journal-filter-drawer"
+      >
+        Filter
+      </button>
       <button type="button" class="nav-pill nav-play-btn" id="mobile-audio-toggle" aria-label="Toggle Music Player">
         <span class="play-icon" />
       </button>
-      <button type="button" class="mobile-col-btn" id="mobile-col-toggle" aria-label="Toggle Column View">
+      <button type="button" class={`mobile-col-btn ${isHomePage ? "" : "is-hidden"}`} id="mobile-col-toggle" aria-label="Toggle Column View">
         {isCol3 ? "1" : "3"}
       </button>
+    </div>
+  </div>
+
+  <div class="mobile-journal-filter-drawer mobile-only" id="mobile-journal-filter-drawer" aria-hidden="true">
+    <button
+      type="button"
+      class="journal-filter-pill mobile-all-pill is-all is-active"
+      data-filter="All"
+    >
+      <span class="filter-dot" aria-hidden="true" />
+      <span>All</span>
+    </button>
+    <div class="mobile-filter-chips">
+      {JOURNAL_CATEGORIES.map((cat) => (
+        <button
+          type="button"
+          class={`journal-filter-pill is-mobile-chip ${cat === "In Another Form" ? "is-accent" : ""}`}
+          data-filter={cat}
+        >
+          <span class="filter-dot" aria-hidden="true" />
+          <span>{cat}</span>
+        </button>
+      ))}
     </div>
   </div>
 </header>
@@ -348,10 +422,121 @@ const isCol3 = initialColView === "3";
     transition: opacity 0.3s ease, transform 0.3s var(--ease-nav);
   }
 
-  .column-switcher.is-hidden {
+  .column-switcher.is-hidden,
+  .journal-filters-desktop.is-hidden {
+    display: none;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-4px);
+  }
+
+  .journal-filters-desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    transition: opacity 0.3s ease, transform 0.3s var(--ease-nav);
+  }
+
+  .journal-filter-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 2px;
+  }
+
+  .journal-filter-row-1 {
+    flex-wrap: nowrap;
+  }
+
+  .journal-filter-row-2 {
+    gap: 3px;
+  }
+
+  .journal-filter-pill {
+    height: var(--header-height);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-pill-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: none;
+    cursor: pointer;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: rgba(0, 0, 0, 0.35);
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition:
+      flex 0.4s var(--ease-nav),
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .journal-filter-pill.is-compact {
+    height: 24px;
+    padding: 0 10px;
+  }
+
+  .journal-filter-row-1 .journal-filter-pill.is-active {
+    flex: 1 1 auto;
+  }
+
+  .journal-filter-pill:hover:not(.is-active):not(.is-accent) {
+    background-color: var(--color-pill-frame);
+    color: var(--color-text-primary);
+  }
+
+  .journal-filter-pill.is-active {
+    background-color: var(--color-pill-active);
+    color: var(--color-text-primary);
+  }
+
+  .journal-filter-pill.is-accent {
+    background-color: rgba(235, 87, 87, 0.12);
+    color: #e05252;
+  }
+
+  .journal-filter-pill.is-accent:hover:not(.is-active) {
+    background-color: rgba(235, 87, 87, 0.2);
+    color: #d63d3d;
+  }
+
+  .journal-filter-pill.is-accent.is-active {
+    background-color: rgba(235, 87, 87, 0.22);
+    color: #d63d3d;
+  }
+
+  .filter-dot {
+    display: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-text-primary);
+    flex-shrink: 0;
+  }
+
+  .journal-filter-pill.is-accent .filter-dot {
+    background-color: #d63d3d;
+  }
+
+  .journal-filter-pill.is-active .filter-dot {
+    display: block;
+  }
+
+  @media (max-width: 1200px) {
+    .journal-filter-row-1 {
+      flex-wrap: wrap;
+    }
+
+    .journal-filter-pill {
+      padding: 0 10px;
+    }
   }
 
   .col-btn {
@@ -501,8 +686,100 @@ const isCol3 = initialColView === "3";
     background-color: var(--color-pill-frame);
   }
 
-  .mobile-col-btn.is-hidden {
+  .mobile-col-btn.is-hidden,
+  .mobile-filter-btn.is-hidden {
     display: none;
+  }
+
+  .mobile-filter-btn {
+    height: var(--header-height);
+    padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-pill-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
+    color: var(--color-text-primary);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+
+  .mobile-filter-btn:hover {
+    background-color: var(--color-pill-frame);
+  }
+
+  .mobile-journal-filter-drawer {
+    position: fixed;
+    top: calc(10px + var(--header-height) + 5px);
+    left: 10px;
+    right: 10px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.25s var(--ease-nav), transform 0.25s var(--ease-nav);
+  }
+
+  .mobile-journal-filter-drawer.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .mobile-journal-filter-drawer:not(.is-open) {
+    visibility: hidden;
+  }
+
+  .mobile-all-pill {
+    width: 100%;
+    height: var(--header-height);
+    background-color: rgba(240, 240, 240, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .mobile-all-pill.is-active {
+    background-color: rgba(240, 240, 240, 0.88);
+  }
+
+  .mobile-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .is-mobile-chip {
+    height: 26px;
+    padding: 0 11px;
+    background-color: rgba(240, 240, 240, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  .is-mobile-chip.is-active {
+    background-color: rgba(220, 220, 220, 0.85);
+    color: var(--color-text-primary);
+  }
+
+  .is-mobile-chip.is-accent {
+    background-color: rgba(245, 220, 220, 0.85);
+    color: #e05252;
+  }
+
+  .is-mobile-chip.is-accent.is-active {
+    background-color: rgba(240, 200, 200, 0.92);
+    color: #d63d3d;
   }
 
   .mobile-menu-overlay {
@@ -671,6 +948,53 @@ const isCol3 = initialColView === "3";
     const mobilePageLabel = document.getElementById("mobile-page-label");
     const mobileColBtn = document.getElementById("mobile-col-toggle");
     const mobileNavItems = document.querySelectorAll<HTMLAnchorElement>(".mobile-nav-item");
+    const journalFiltersDesktop = document.getElementById("journal-filters-desktop");
+    const mobileFilterBtn = document.getElementById("mobile-journal-filter-btn");
+    const mobileFilterDrawer = document.getElementById("mobile-journal-filter-drawer");
+    const allFilterPills = document.querySelectorAll<HTMLButtonElement>(".journal-filter-pill");
+
+    function setMobileFilterDrawer(open: boolean) {
+      if (!mobileFilterBtn || !mobileFilterDrawer) return;
+      if (open) {
+        mobileFilterDrawer.classList.add("is-open");
+        mobileFilterDrawer.setAttribute("aria-hidden", "false");
+        mobileFilterBtn.textContent = "Close";
+        mobileFilterBtn.setAttribute("aria-expanded", "true");
+      } else {
+        mobileFilterDrawer.classList.remove("is-open");
+        mobileFilterDrawer.setAttribute("aria-hidden", "true");
+        mobileFilterBtn.textContent = "Filter";
+        mobileFilterBtn.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    if (mobileFilterBtn && mobileFilterDrawer) {
+      mobileFilterBtn.addEventListener("click", () => {
+        const isOpen = mobileFilterDrawer.classList.contains("is-open");
+        setMobileFilterDrawer(!isOpen);
+      });
+    }
+
+    function applyJournalFilterUI(category: string) {
+      allFilterPills.forEach((pill) => {
+        if (pill.dataset.filter === category) {
+          pill.classList.add("is-active");
+        } else {
+          pill.classList.remove("is-active");
+        }
+      });
+    }
+
+    allFilterPills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        const category = pill.dataset.filter || "All";
+        applyJournalFilterUI(category);
+        window.dispatchEvent(new CustomEvent("journal-filter-change", { detail: { category } }));
+      });
+    });
+
+    (window as any).syncJournalFilterState = applyJournalFilterUI;
+    (window as any).closeMobileJournalFilter = () => setMobileFilterDrawer(false);
 
     function openMobileMenu() {
       if (mobileMenuOverlay) {
@@ -760,6 +1084,24 @@ const isCol3 = initialColView === "3";
           mobileColBtn.classList.remove("is-hidden");
         } else {
           mobileColBtn.classList.add("is-hidden");
+        }
+      }
+
+      const isJournal = activePath === "/journal" || activePath.startsWith("/journal/");
+      if (journalFiltersDesktop) {
+        if (isJournal) {
+          journalFiltersDesktop.classList.remove("is-hidden");
+        } else {
+          journalFiltersDesktop.classList.add("is-hidden");
+        }
+      }
+
+      if (mobileFilterBtn) {
+        if (isJournal) {
+          mobileFilterBtn.classList.remove("is-hidden");
+        } else {
+          mobileFilterBtn.classList.add("is-hidden");
+          setMobileFilterDrawer(false);
         }
       }
     }

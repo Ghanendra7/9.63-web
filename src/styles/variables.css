@@ -13,14 +13,14 @@
   --font-primary: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --text-size: 13px;
-  --text-leading: 1.37;
-  --text-tracking: 0.78px;
+  --text-size: 12px;
+  --text-leading: 1.2;
+  --text-tracking: 0.72px;
 
   --radius-pill: 20px;
   --radius-pill-sm: 23px;
   --radius-brand: 51px;
-  --radius-card: 20px;
+  --radius-card: 9px;
 
   --header-height: 30px;
   --header-top: 17px;

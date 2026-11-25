@@ -1,33 +1,341 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import JournalCard from "../components/JournalCard.astro";
+import EditorialFooter from "../components/EditorialFooter.astro";
+import { getJournals } from "../lib/journals";
+
+const journals = await getJournals();
 ---
 
 <Layout title="9.63 — Journal" namespace="journal">
-  <div class="page-container page-content">
-    <div class="content-wrapper">
-      <h1 class="page-title">Journal</h1>
+  <div class="journal-container" id="journal-page-root">
+    <section class="journal-feed" id="journal-feed" aria-label="Journal Entries">
+      {journals.map((entry, index) => (
+        <JournalCard
+          entry={entry}
+          index={index}
+          totalEntries={journals.length}
+        />
+      ))}
+    </section>
+
+    <p class="journal-empty is-hidden" id="journal-empty-state">
+      No entries in this category yet.
+    </p>
+
+    <div class="journal-footer-wrapper">
+      <EditorialFooter />
     </div>
   </div>
 </Layout>
 
 <style>
-  .page-content {
+  .journal-container {
+    width: 100%;
     min-height: 100dvh;
-    padding-top: calc(var(--header-top) + var(--header-height) + 60px);
-    padding-bottom: 80px;
+    padding-top: 155px;
+    padding-bottom: 30px;
+    padding-left: var(--page-margin);
+    padding-right: var(--page-margin);
+    max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .content-wrapper {
+  .journal-feed {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 84px;
+    width: 100%;
   }
 
-  .page-title {
+  .journal-empty {
     font-size: var(--text-size);
-    font-weight: 400;
+    line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
-    text-transform: uppercase;
     color: var(--color-text-muted);
+    padding: 40px 0;
+  }
+
+  .journal-empty.is-hidden {
+    display: none;
+  }
+
+  .journal-footer-wrapper {
+    width: 100%;
+    margin-top: 96px;
+  }
+
+  @media (max-width: 768px) {
+    .journal-container {
+      padding-top: 48px;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-bottom: 60px;
+    }
+
+    .journal-feed {
+      gap: 44px;
+    }
+
+    .journal-footer-wrapper {
+      margin-top: 56px;
+    }
   }
 </style>
+
+<script>
+  import { gsap } from "gsap";
+
+  function initJournalPage() {
+    const feed = document.getElementById("journal-feed");
+    if (!feed) return;
+
+    const cards = Array.from(feed.querySelectorAll<HTMLElement>("[data-journal-card]"));
+    const emptyState = document.getElementById("journal-empty-state");
+
+    // Reset filter UI to All when entering the Journal page
+    if (typeof window !== "undefined" && (window as any).syncJournalFilterState) {
+      (window as any).syncJournalFilterState("All");
+    }
+
+    function applyFilter(category: string) {
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const matches = category === "All" || card.dataset.category === category;
+        if (matches) {
+          card.classList.remove("is-filtered-out");
+          visibleCount++;
+        } else {
+          card.classList.add("is-filtered-out");
+        }
+      });
+
+      if (emptyState) {
+        emptyState.classList.toggle("is-hidden", visibleCount > 0);
+      }
+
+      const visibleCards = cards.filter((c) => !c.classList.contains("is-filtered-out"));
+      if (visibleCards.length > 0) {
+        gsap.fromTo(
+          visibleCards,
+          { opacity: 0, y: 8 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.35,
+            stagger: 0.04,
+            ease: "power2.out",
+            clearProps: "transform",
+            onComplete: () => {
+              if ((window as any).__lenis) {
+                (window as any).__lenis.resize();
+              }
+            },
+          }
+        );
+      } else if ((window as any).__lenis) {
+        (window as any).__lenis.resize();
+      }
+    }
+
+    // Bind filter listener to the currently mounted feed (safe across Barba navigations)
+    if ((window as any).__journalFilterHandler) {
+      window.removeEventListener("journal-filter-change", (window as any).__journalFilterHandler);
+    }
+    const filterHandler = ((e: CustomEvent<{ category: string }>) => {
+      if (e.detail?.category) {
+        applyFilter(e.detail.category);
+      }
+    }) as EventListener;
+    (window as any).__journalFilterHandler = filterHandler;
+    window.addEventListener("journal-filter-change", filterHandler);
+
+    // Initialize infinite carousel for each journal card
+    cards.forEach((card) => {
+      if ((card as any).__journalCarouselInit) return;
+      (card as any).__journalCarouselInit = true;
+
+      const activeFrame = card.querySelector<HTMLElement>("[data-active-frame]");
+      const slides = Array.from(card.querySelectorAll<HTMLImageElement>(".journal-slide-img"));
+      const activeCounter = card.querySelector<HTMLElement>("[data-active-counter]");
+      const thumbsTrack = card.querySelector<HTMLElement>("[data-thumbs-track]");
+      const thumbItems = Array.from(card.querySelectorAll<HTMLElement>("[data-thumb-offset]"));
+      const dots = Array.from(card.querySelectorAll<HTMLButtonElement>(".journal-dot"));
+
+      const total = slides.length;
+      if (total <= 1) return;
+
+      const slideData = slides.map((img) => ({
+        src: img.getAttribute("src") || "",
+        alt: img.getAttribute("alt") || "",
+        objectPosition: img.style.objectPosition || "50% 50%",
+      }));
+
+      let activeIdx = 0;
+      let isAnimating = false;
+
+      function syncUI(nextIdx: number) {
+        activeIdx = ((nextIdx % total) + total) % total;
+
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("is-active", i === activeIdx);
+        });
+
+        dots.forEach((dot, i) => {
+          dot.classList.toggle("is-active", i === activeIdx);
+        });
+
+        if (activeCounter) {
+          activeCounter.textContent = `${activeIdx + 1}/${total}`;
+        }
+
+        thumbItems.forEach((item, slotIdx) => {
+          const offset = slotIdx + 1;
+          const targetIdx = (activeIdx + offset) % total;
+          const data = slideData[targetIdx];
+          const thumbImg = item.querySelector<HTMLImageElement>(".journal-thumb-img");
+          const thumbCounter = item.querySelector<HTMLElement>("[data-thumb-counter]");
+          const thumbBtn = item.querySelector<HTMLButtonElement>(".journal-thumb-btn");
+
+          if (thumbImg && data) {
+            thumbImg.src = data.src;
+            thumbImg.alt = data.alt;
+            thumbImg.style.objectPosition = data.objectPosition;
+          }
+          if (thumbCounter) {
+            thumbCounter.textContent = `${targetIdx + 1}/${total}`;
+          }
+          if (thumbBtn) {
+            thumbBtn.setAttribute("aria-label", `View image ${targetIdx + 1} of ${total}`);
+          }
+        });
+      }
+
+      function goToOffset(offset: number) {
+        if (isAnimating) return;
+        const nextIdx = (activeIdx + offset + total) % total;
+
+        if (thumbsTrack && thumbItems.length > 0 && offset > 0) {
+          isAnimating = true;
+          const firstItem = thumbItems[0];
+          const gap = parseFloat(getComputedStyle(thumbsTrack).columnGap || getComputedStyle(thumbsTrack).gap || "14") || 14;
+          const stepWidth = firstItem.getBoundingClientRect().width + gap;
+          const shiftX = stepWidth * Math.min(offset, thumbItems.length);
+
+          // Crossfade active slide immediately while track slides left
+          slides.forEach((slide, i) => {
+            slide.classList.toggle("is-active", i === nextIdx);
+          });
+          if (activeCounter) {
+            activeCounter.textContent = `${nextIdx + 1}/${total}`;
+          }
+          dots.forEach((dot, i) => {
+            dot.classList.toggle("is-active", i === nextIdx);
+          });
+
+          gsap.to(thumbsTrack, {
+            x: -shiftX,
+            duration: 0.36,
+            ease: "power3.out",
+            onComplete: () => {
+              gsap.set(thumbsTrack, { x: 0 });
+              syncUI(nextIdx);
+              isAnimating = false;
+            },
+          });
+        } else {
+          syncUI(nextIdx);
+        }
+      }
+
+      // Desktop: click any small inactive thumbnail to slide it into active
+      thumbItems.forEach((item, slotIdx) => {
+        const btn = item.querySelector<HTMLButtonElement>(".journal-thumb-btn");
+        if (!btn) return;
+        btn.addEventListener("click", () => {
+          goToOffset(slotIdx + 1);
+        });
+      });
+
+      // Mobile: dot clicks
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = Number(dot.dataset.dotIndex ?? 0);
+          syncUI(target);
+        });
+      });
+
+      // Mobile: infinite horizontal touch swipe on active frame
+      if (activeFrame) {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        let isSwiping = false;
+
+        activeFrame.addEventListener(
+          "touchstart",
+          (e: TouchEvent) => {
+            if (e.touches.length !== 1) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchEndX = touchStartX;
+            touchEndY = touchStartY;
+            isSwiping = false;
+          },
+          { passive: true }
+        );
+
+        activeFrame.addEventListener(
+          "touchmove",
+          (e: TouchEvent) => {
+            if (e.touches.length !== 1) return;
+            touchEndX = e.touches[0].clientX;
+            touchEndY = e.touches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            if (Math.abs(diffX) > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+              isSwiping = true;
+            }
+          },
+          { passive: true }
+        );
+
+        activeFrame.addEventListener(
+          "touchend",
+          () => {
+            if (!isSwiping) return;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            if (Math.abs(diffX) > 30 && Math.abs(diffX) > Math.abs(diffY)) {
+              if (diffX < 0) {
+                syncUI(activeIdx + 1);
+              } else {
+                syncUI(activeIdx - 1);
+              }
+            }
+            isSwiping = false;
+          },
+          { passive: true }
+        );
+      }
+    });
+  }
+
+  if (typeof window !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initJournalPage);
+    } else {
+      initJournalPage();
+    }
+    document.addEventListener("astro:page-load", initJournalPage);
+
+    import("@barba/core")
+      .then((m) => {
+        m.default?.hooks?.after(initJournalPage);
+      })
+      .catch(() => {});
+  }
+</script>

@@ -11,14 +11,31 @@ interface Props {
   mobileRow: number;
 }
 
-const { project, index, desktopCol, desktopRow, mobileCol, mobileRow } = Astro.props;
+const { project, index, desktopCol, desktopRow, mobileCol, mobileRow } =
+  Astro.props;
 
-const coverUrl = project.coverImage?.asset?.url || (project.coverImage ? urlFor(project.coverImage).width(800).auto("format").url() : `/placeholders/pd${(index % 8) + 1}.png`);
-const galleryUrl = project.gallery?.[0]?.asset?.url || (project.gallery?.[0] ? urlFor(project.gallery[0]).width(800).auto("format").url() : null);
+const rawImages =
+  project.images && project.images.length > 0
+    ? project.images
+    : [project.coverImage, ...(project.gallery || [])].filter(Boolean);
+
+const firstImg = rawImages[0];
+const hasAsset = Boolean(firstImg?.asset?._id || firstImg?.asset?._ref);
+const coverUrl = hasAsset
+  ? urlFor(firstImg).width(800).auto("format").url()
+  : firstImg?.asset?.url || `/placeholders/pd${(index % 8) + 1}.png`;
+
+const focalX =
+  firstImg?.hotspot?.x != null ? Math.round(firstImg.hotspot.x * 100) : 50;
+const focalY =
+  firstImg?.hotspot?.y != null ? Math.round(firstImg.hotspot.y * 100) : 50;
+const objectPosition = `${focalX}% ${focalY}%`;
 
 const projectOrder = index + 1;
 const projectNum = String(projectOrder).padStart(2, "0");
-const slug = project.slug?.current || `project-${projectNum}`;
+const slug =
+  (typeof project.slug === "object" ? project.slug?.current : project.slug) ||
+  `project-${projectNum}`;
 ---
 
 <article
@@ -26,24 +43,16 @@ const slug = project.slug?.current || `project-${projectNum}`;
   style={`--col-d: ${desktopCol}; --row-d: ${desktopRow}; --col-m: ${mobileCol}; --row-m: ${mobileRow};`}
   aria-label={`Project ${projectNum}: ${project.title}`}
 >
-  <a href={`/project/${slug}`} class="constellation-link" tabindex="0">
+  <div class="constellation-link">
     <div class="constellation-media">
       <img
         src={coverUrl}
-        alt={project.coverImage?.alt || project.title}
+        alt={firstImg?.alt || project.title}
         class="constellation-img primary-img"
+        style={`object-position: ${objectPosition};`}
         loading="lazy"
         decoding="async"
       />
-      {galleryUrl && (
-        <img
-          src={galleryUrl}
-          alt={`${project.title} preview`}
-          class="constellation-img secondary-img"
-          loading="lazy"
-          decoding="async"
-        />
-      )}
 
       {project.comingSoon && (
         <div class="constellation-soon" aria-hidden="true">
@@ -58,7 +67,7 @@ const slug = project.slug?.current || `project-${projectNum}`;
         </div>
       </div>
     </div>
-  </a>
+  </div>
 </article>
 
 <style>
@@ -66,11 +75,11 @@ const slug = project.slug?.current || `project-${projectNum}`;
     grid-column: var(--col-d);
     grid-row: var(--row-d);
     width: 100%;
-    aspect-ratio: 2500 / 3112;
+    aspect-ratio: 3 / 4;
     border-radius: var(--radius-card);
     overflow: hidden;
     position: relative;
-    transition: transform 0.4s var(--ease-expo);
+    transition: opacity 0.35s var(--ease-nav);
   }
 
   .constellation-link {
@@ -98,30 +107,12 @@ const slug = project.slug?.current || `project-${projectNum}`;
     height: 100%;
     object-fit: cover;
     border-radius: var(--radius-card);
-    transition: opacity 0.35s var(--ease-nav), transform 0.6s var(--ease-expo);
+    transition: opacity 0.35s var(--ease-nav);
   }
 
   .primary-img {
     opacity: 1;
     z-index: 1;
-  }
-
-  .secondary-img {
-    opacity: 0;
-    z-index: 2;
-  }
-
-  .constellation-card:hover {
-    transform: translateY(-2px);
-  }
-
-  .constellation-card:hover .primary-img {
-    transform: scale(1.04);
-  }
-
-  .constellation-card:hover .secondary-img {
-    opacity: 1;
-    transform: scale(1.04);
   }
 
   .constellation-soon {
@@ -138,12 +129,17 @@ const slug = project.slug?.current || `project-${projectNum}`;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.25s var(--ease-nav);
+  }
+
+  .constellation-card:hover .constellation-soon {
+    opacity: 0;
   }
 
   .constellation-soon span {
-    font-size: 10px;
-    line-height: 1;
-    letter-spacing: 0.5px;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
     color: rgba(0, 0, 0, 0.35);
     white-space: nowrap;
   }
@@ -179,18 +175,20 @@ const slug = project.slug?.current || `project-${projectNum}`;
   }
 
   .overlay-num {
-    font-size: 11px;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
     color: var(--color-text-muted);
-    line-height: 1;
   }
 
   .overlay-title {
-    font-size: 11px;
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    letter-spacing: var(--text-tracking);
     color: var(--color-text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1;
   }
 
   @media (max-width: 768px) {

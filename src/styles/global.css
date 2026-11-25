@@ -6,10 +6,19 @@ html {
   color: var(--color-text-primary);
   font-family: var(--font-primary);
   font-size: var(--text-size);
+  font-weight: 400;
   line-height: var(--text-leading);
   letter-spacing: var(--text-tracking);
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: var(--text-size);
+  font-weight: 400;
+  line-height: var(--text-leading);
+  letter-spacing: var(--text-tracking);
 }
 
 html::-webkit-scrollbar,

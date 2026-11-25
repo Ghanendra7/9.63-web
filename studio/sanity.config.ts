@@ -21,8 +21,14 @@ export default defineConfig({
               S,
               context,
             }),
+            orderableDocumentListDeskItem({
+              type: "journal",
+              title: "Journals",
+              S,
+              context,
+            }),
             ...S.documentTypeListItems().filter(
-              (listItem) => listItem.getId() !== "project"
+              (listItem) => !["project", "journal"].includes(listItem.getId() || "")
             ),
           ]);
       },
