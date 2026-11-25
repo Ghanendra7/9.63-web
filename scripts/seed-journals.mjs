@@ -65,7 +65,6 @@ async function seedJournals() {
     {
       _id: "journal-33",
       _type: "journal",
-      entryNumber: "33",
       title: "OFF Brand: Why you still need a website",
       excerpt:
         "Notes on building dedicated digital spaces outside social platforms, where typography, pacing, and visual systems can hold attention without algorithmic noise.",
@@ -75,7 +74,6 @@ async function seedJournals() {
     {
       _id: "journal-32",
       _type: "journal",
-      entryNumber: "32",
       title: "Notes on Editorial Restraint",
       excerpt:
         "Exploring how negative space, quiet typographic hierarchy, and tactile paper stocks shape the rhythm of contemporary independent print publications.",
@@ -85,7 +83,6 @@ async function seedJournals() {
     {
       _id: "journal-31",
       _type: "journal",
-      entryNumber: "31",
       title: "Studio Conversation: Form & Material",
       excerpt:
         "A short reflection from our recent press feature discussing interdisciplinary collaboration across spatial design, photography, and digital craft.",
@@ -95,7 +92,6 @@ async function seedJournals() {
     {
       _id: "journal-30",
       _type: "journal",
-      entryNumber: "30",
       title: "Identity Systems in Motion",
       excerpt:
         "Case study fragments examining how modular grids and flexible brand marks adapt across packaging, exhibition signage, and web interfaces.",
@@ -105,7 +101,6 @@ async function seedJournals() {
     {
       _id: "journal-29",
       _type: "journal",
-      entryNumber: "29",
       title: "Print Proofing Archive 04",
       excerpt:
         "Behind the scenes of color calibration, uncoated stock selection, and binding tests for our upcoming seasonal monograph series.",
@@ -115,7 +110,6 @@ async function seedJournals() {
     {
       _id: "journal-28",
       _type: "journal",
-      entryNumber: "28",
       title: "Positioning Beyond Categories",
       excerpt:
         "Observations on helping emerging cultural and design-led studios articulate clear strategic narratives rooted in craft rather than trends.",
@@ -125,7 +119,6 @@ async function seedJournals() {
     {
       _id: "journal-27",
       _type: "journal",
-      entryNumber: "27",
       title: "Minimal Interfaces & Slow Reading",
       excerpt:
         "Designing web experiences that prioritize clarity, subtle motion transitions, and uninterrupted visual storytelling across desktop and mobile.",
@@ -135,7 +128,6 @@ async function seedJournals() {
     {
       _id: "journal-26",
       _type: "journal",
-      entryNumber: "26",
       title: "Selected Works: Autumn Direction",
       excerpt:
         "A brief spotlight on recent art direction studies pairing architectural interiors with candid portraiture and natural daylight.",
@@ -145,7 +137,6 @@ async function seedJournals() {
     {
       _id: "journal-25",
       _type: "journal",
-      entryNumber: "25",
       title: "Spotlight: Spatial Objects",
       excerpt:
         "Documenting collaborative object studies and exhibition previews developed alongside independent makers and ceramicists in New York.",

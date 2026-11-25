@@ -17,7 +17,6 @@ export type JournalCategory = (typeof JOURNAL_CATEGORIES)[number];
 export interface JournalEntry {
   _id: string;
   _type?: "journal";
-  entryNumber?: string;
   title: string;
   excerpt: string;
   category: string;

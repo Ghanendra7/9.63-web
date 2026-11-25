@@ -21,12 +21,6 @@ export const journalType = defineType({
   fields: [
     orderRankField({ type: "journal" }),
     defineField({
-      name: "entryNumber",
-      title: "Entry Number",
-      description: "Optional display number (e.g. 33, 32, 31).",
-      type: "string",
-    }),
-    defineField({
       name: "title",
       title: "Title",
       type: "string",
@@ -77,13 +71,11 @@ export const journalType = defineType({
     select: {
       title: "title",
       subtitle: "category",
-      entryNumber: "entryNumber",
       media: "images.0",
     },
-    prepare({ title, subtitle, entryNumber, media }) {
-      const prefix = entryNumber ? `${entryNumber} — ` : "";
+    prepare({ title, subtitle, media }) {
       return {
-        title: `${prefix}${title || "Untitled"}`,
+        title: title || "Untitled",
         subtitle: subtitle || "",
         media,
       };

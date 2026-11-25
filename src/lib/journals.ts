@@ -4,7 +4,6 @@ import type { JournalEntry } from "../types/journal";
 export const JOURNALS_QUERY = `*[_type == "journal" && !(_id in path('drafts.**'))] | order(orderRank asc) {
   _id,
   _type,
-  entryNumber,
   title,
   excerpt,
   category,

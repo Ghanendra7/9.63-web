@@ -5,10 +5,9 @@ import { urlFor } from "../lib/sanity";
 interface Props {
   entry: JournalEntry;
   index: number;
-  totalEntries: number;
 }
 
-const { entry, index, totalEntries } = Astro.props;
+const { entry, index } = Astro.props;
 
 const images = (entry.images && entry.images.length > 0)
   ? entry.images
@@ -21,7 +20,7 @@ const images = (entry.images && entry.images.length > 0)
 
 const totalSlides = images.length;
 const hasMultipleImages = totalSlides > 1;
-const displayNumber = entry.entryNumber || String(totalEntries - index).padStart(2, "0");
+const displayNumber = String(index + 1).padStart(2, "0");
 const isAccentCategory = entry.category === "In Another Form";
 
 const resolvedImages = images.map((img, imgIndex) => {
