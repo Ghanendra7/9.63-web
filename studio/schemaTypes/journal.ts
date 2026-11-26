@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
+import { TwoColumnCategoriesInput } from "../components/TwoColumnCategoriesInput";
 
 export const JOURNAL_CATEGORY_OPTIONS = [
   { title: "Brand Identity", value: "Brand Identity" },
@@ -34,14 +35,18 @@ export const journalType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "category",
-      title: "Category",
-      type: "string",
+      name: "categories",
+      title: "Categories",
+      type: "array",
+      of: [{ type: "string" }],
       options: {
         list: JOURNAL_CATEGORY_OPTIONS,
-        layout: "dropdown",
+        layout: "grid",
       },
-      validation: (rule) => rule.required(),
+      components: {
+        input: TwoColumnCategoriesInput,
+      },
+      validation: (rule) => rule.min(1).error("Select at least 1 category"),
     }),
     defineField({
       name: "images",
@@ -70,13 +75,14 @@ export const journalType = defineType({
   preview: {
     select: {
       title: "title",
-      subtitle: "category",
+      categories: "categories",
       media: "images.0",
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ title, categories, media }) {
+      const subtitle = Array.isArray(categories) ? categories.join(", ") : "";
       return {
         title: title || "Untitled",
-        subtitle: subtitle || "",
+        subtitle,
         media,
       };
     },

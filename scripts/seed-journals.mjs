@@ -68,7 +68,7 @@ async function seedJournals() {
       title: "OFF Brand: Why you still need a website",
       excerpt:
         "Notes on building dedicated digital spaces outside social platforms, where typography, pacing, and visual systems can hold attention without algorithmic noise.",
-      category: "In Another Form",
+      categories: ["In Another Form", "Editorial"],
       images: pickImages(0, 5),
     },
     {
@@ -77,7 +77,7 @@ async function seedJournals() {
       title: "Notes on Editorial Restraint",
       excerpt:
         "Exploring how negative space, quiet typographic hierarchy, and tactile paper stocks shape the rhythm of contemporary independent print publications.",
-      category: "Editorial",
+      categories: ["Editorial"],
       images: pickImages(3, 5),
     },
     {
@@ -86,7 +86,7 @@ async function seedJournals() {
       title: "Studio Conversation: Form & Material",
       excerpt:
         "A short reflection from our recent press feature discussing interdisciplinary collaboration across spatial design, photography, and digital craft.",
-      category: "Press & Feature",
+      categories: ["Press & Feature"],
       images: pickImages(6, 5),
     },
     {
@@ -95,7 +95,7 @@ async function seedJournals() {
       title: "Identity Systems in Motion",
       excerpt:
         "Case study fragments examining how modular grids and flexible brand marks adapt across packaging, exhibition signage, and web interfaces.",
-      category: "Brand Identity",
+      categories: ["Brand Identity", "Case Study"],
       images: pickImages(9, 4),
     },
     {
@@ -104,7 +104,7 @@ async function seedJournals() {
       title: "Print Proofing Archive 04",
       excerpt:
         "Behind the scenes of color calibration, uncoated stock selection, and binding tests for our upcoming seasonal monograph series.",
-      category: "Editorial or Print",
+      categories: ["Editorial or Print"],
       images: pickImages(2, 4),
     },
     {
@@ -113,7 +113,7 @@ async function seedJournals() {
       title: "Positioning Beyond Categories",
       excerpt:
         "Observations on helping emerging cultural and design-led studios articulate clear strategic narratives rooted in craft rather than trends.",
-      category: "Brand Positioning",
+      categories: ["Brand Positioning"],
       images: pickImages(5, 4),
     },
     {
@@ -122,7 +122,7 @@ async function seedJournals() {
       title: "Minimal Interfaces & Slow Reading",
       excerpt:
         "Designing web experiences that prioritize clarity, subtle motion transitions, and uninterrupted visual storytelling across desktop and mobile.",
-      category: "Digital Design",
+      categories: ["Digital Design"],
       images: pickImages(8, 4),
     },
     {
@@ -131,7 +131,7 @@ async function seedJournals() {
       title: "Selected Works: Autumn Direction",
       excerpt:
         "A brief spotlight on recent art direction studies pairing architectural interiors with candid portraiture and natural daylight.",
-      category: "Case Study",
+      categories: ["Case Study"],
       images: pickImages(11, 4),
     },
     {
@@ -140,7 +140,7 @@ async function seedJournals() {
       title: "Spotlight: Spatial Objects",
       excerpt:
         "Documenting collaborative object studies and exhibition previews developed alongside independent makers and ceramicists in New York.",
-      category: "Project Spotlights",
+      categories: ["Project Spotlights"],
       images: pickImages(1, 4),
     },
   ];

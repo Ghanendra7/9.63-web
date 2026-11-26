@@ -32,8 +32,8 @@ const journals = await getJournals();
   .journal-container {
     width: 100%;
     min-height: 100dvh;
-    padding-top: 155px;
-    padding-bottom: 30px;
+    padding-top: 188px;
+    padding-bottom: var(--page-margin);
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
     max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
@@ -44,7 +44,7 @@ const journals = await getJournals();
   .journal-feed {
     display: flex;
     flex-direction: column;
-    gap: 84px;
+    gap: 100px;
     width: 100%;
   }
 
@@ -62,23 +62,20 @@ const journals = await getJournals();
 
   .journal-footer-wrapper {
     width: 100%;
-    margin-top: 96px;
+    margin-top: 200px;
   }
 
   @media (max-width: 768px) {
     .journal-container {
-      padding-top: 48px;
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-bottom: 60px;
+      padding-top: 62px;
     }
 
     .journal-feed {
-      gap: 44px;
+      gap: 40px;
     }
 
     .journal-footer-wrapper {
-      margin-top: 56px;
+      margin-top: 100px;
     }
   }
 </style>
@@ -95,46 +92,36 @@ const journals = await getJournals();
 
     // Reset filter UI to All when entering the Journal page
     if (typeof window !== "undefined" && (window as any).syncJournalFilterState) {
-      (window as any).syncJournalFilterState("All");
+      (window as any).syncJournalFilterState([]);
     }
 
-    function applyFilter(category: string) {
-      let visibleCount = 0;
+    function applyFilter(categories: string[]) {
+      const selected = new Set(categories);
+      const hasSelection = selected.size > 0;
 
-      cards.forEach((card) => {
-        const matches = category === "All" || card.dataset.category === category;
-        if (matches) {
-          card.classList.remove("is-filtered-out");
-          visibleCount++;
-        } else {
-          card.classList.add("is-filtered-out");
-        }
+      const getCardCategories = (card: HTMLElement) =>
+        (card.dataset.categories || "").split("||").filter(Boolean);
+
+      const isMatch = (card: HTMLElement) =>
+        hasSelection && getCardCategories(card).some((cat) => selected.has(cat));
+
+      const sortedCards = [...cards].sort((a, b) => {
+        const aMatch = isMatch(a) ? 0 : 1;
+        const bMatch = isMatch(b) ? 0 : 1;
+        if (aMatch !== bMatch) return aMatch - bMatch;
+        return Number(a.dataset.orderIndex ?? 0) - Number(b.dataset.orderIndex ?? 0);
       });
 
-      if (emptyState) {
-        emptyState.classList.toggle("is-hidden", visibleCount > 0);
-      }
+      sortedCards.forEach((card) => {
+        const badges = card.querySelectorAll<HTMLElement>("[data-category-badge]");
+        badges.forEach((badge) => {
+          const badgeCat = badge.dataset.badgeCategory || "";
+          badge.classList.toggle("is-active-filter", hasSelection && selected.has(badgeCat));
+        });
+        feed.appendChild(card);
+      });
 
-      const visibleCards = cards.filter((c) => !c.classList.contains("is-filtered-out"));
-      if (visibleCards.length > 0) {
-        gsap.fromTo(
-          visibleCards,
-          { opacity: 0, y: 8 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-            stagger: 0.04,
-            ease: "power2.out",
-            clearProps: "transform",
-            onComplete: () => {
-              if ((window as any).__lenis) {
-                (window as any).__lenis.resize();
-              }
-            },
-          }
-        );
-      } else if ((window as any).__lenis) {
+      if ((window as any).__lenis) {
         (window as any).__lenis.resize();
       }
     }
@@ -143,10 +130,8 @@ const journals = await getJournals();
     if ((window as any).__journalFilterHandler) {
       window.removeEventListener("journal-filter-change", (window as any).__journalFilterHandler);
     }
-    const filterHandler = ((e: CustomEvent<{ category: string }>) => {
-      if (e.detail?.category) {
-        applyFilter(e.detail.category);
-      }
+    const filterHandler = ((e: CustomEvent<{ categories: string[] }>) => {
+      applyFilter(e.detail?.categories || []);
     }) as EventListener;
     (window as any).__journalFilterHandler = filterHandler;
     window.addEventListener("journal-filter-change", filterHandler);
@@ -167,7 +152,7 @@ const journals = await getJournals();
       if (total <= 1) return;
 
       const slideData = slides.map((img) => ({
-        src: img.getAttribute("src") || "",
+        src: img.getAttribute("data-thumb-src") || img.getAttribute("src") || "",
         alt: img.getAttribute("alt") || "",
         objectPosition: img.style.objectPosition || "50% 50%",
       }));

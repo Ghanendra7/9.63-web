@@ -93,7 +93,7 @@ const MOBILE_SLOTS = [
     </section>
 
     <div class="feed-footer-wrapper">
-      <EditorialFooter />
+      <EditorialFooter projects={projects} />
     </div>
   </div>
 </Layout>
@@ -102,7 +102,7 @@ const MOBILE_SLOTS = [
   .home-container {
     width: 100%;
     min-height: 100dvh;
-    padding-bottom: 30px;
+    padding-bottom: var(--page-margin);
     padding-left: var(--page-margin);
     padding-right: var(--page-margin);
     max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
@@ -164,12 +164,6 @@ const MOBILE_SLOTS = [
   }
 
   @media (max-width: 768px) {
-    .home-container {
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-bottom: 60px;
-    }
-
     .constellation-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 3px;

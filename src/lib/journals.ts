@@ -6,6 +6,7 @@ export const JOURNALS_QUERY = `*[_type == "journal" && !(_id in path('drafts.**'
   _type,
   title,
   excerpt,
+  categories,
   category,
   images[] {
     _key,
@@ -30,6 +31,12 @@ export async function getJournals(): Promise<JournalEntry[]> {
     if (rawJournals && rawJournals.length > 0) {
       return rawJournals.map((entry) => ({
         ...entry,
+        categories:
+          Array.isArray(entry.categories) && entry.categories.length > 0
+            ? entry.categories
+            : entry.category
+              ? [entry.category]
+              : [],
         images: (entry.images || []).filter((img) => Boolean(img?.asset?._id || img?.asset?.url)),
       }));
     }

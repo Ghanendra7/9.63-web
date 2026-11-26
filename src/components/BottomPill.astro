@@ -25,7 +25,7 @@
 <style>
   .bottom-pill-wrapper {
     position: fixed;
-    bottom: 20px;
+    bottom: var(--page-margin);
     left: 0;
     right: 0;
     z-index: 999;
@@ -40,7 +40,7 @@
     padding-right: var(--page-margin);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--grid-gutter);
+    gap: 0;
   }
 
   .newsletter-form {
@@ -92,7 +92,7 @@
 
   .newsletter-submit {
     height: 30px;
-    padding: 0 24px;
+    padding: 0 28px;
     border-radius: var(--radius-pill-sm);
     background-color: var(--color-pill-active);
     color: var(--color-text-primary);
@@ -123,6 +123,10 @@
     .newsletter-form {
       grid-column: 1;
     }
+
+    .newsletter-submit {
+      padding: 0 20px;
+    }
   }
 </style>
 
@@ -147,9 +151,102 @@
     }
   }
 
+  let bottomPillEl: HTMLElement | null = null;
+  let mobileSlotEl: HTMLElement | null = null;
+  let pillDockState: "fixed" | "docked" = "fixed";
+  let lastDockedTop = "";
+  let dockRafId = 0;
+
+  function refreshBottomPillRefs() {
+    bottomPillEl = document.getElementById("bottom-pill");
+    mobileSlotEl = document.getElementById("mobile-pill-slot");
+  }
+
+  function updateBottomPillPosition() {
+    dockRafId = 0;
+    const pill = bottomPillEl ?? document.getElementById("bottom-pill");
+    if (!pill) return;
+
+    const slot =
+      mobileSlotEl && mobileSlotEl.isConnected
+        ? mobileSlotEl
+        : document.getElementById("mobile-pill-slot");
+    mobileSlotEl = slot;
+
+    const isMobileSlotVisible = Boolean(slot && slot.offsetParent !== null);
+
+    if (!isMobileSlotVisible) {
+      if (pillDockState !== "fixed") {
+        pill.style.position = "";
+        pill.style.top = "";
+        pill.style.bottom = "";
+        pillDockState = "fixed";
+        lastDockedTop = "";
+      }
+      return;
+    }
+
+    const slotRect = slot!.getBoundingClientRect();
+    const pillHeight = pill.offsetHeight || 34;
+    const bottomOffset = window.innerWidth <= 768 ? 10 : 20;
+    const fixedTop = window.innerHeight - bottomOffset - pillHeight;
+
+    if (slotRect.top <= fixedTop) {
+      const nextTop = `${window.scrollY + slotRect.top}px`;
+      if (pillDockState !== "docked") {
+        pill.style.position = "absolute";
+        pill.style.bottom = "auto";
+        pillDockState = "docked";
+      }
+      if (lastDockedTop !== nextTop) {
+        pill.style.top = nextTop;
+        lastDockedTop = nextTop;
+      }
+    } else if (pillDockState !== "fixed") {
+      pill.style.position = "";
+      pill.style.top = "";
+      pill.style.bottom = "";
+      pillDockState = "fixed";
+      lastDockedTop = "";
+    }
+  }
+
+  function scheduleBottomPillUpdate() {
+    if (dockRafId) return;
+    dockRafId = requestAnimationFrame(updateBottomPillPosition);
+  }
+
+  function initBottomPillDocking() {
+    refreshBottomPillRefs();
+
+    if (document.documentElement.hasAttribute("data-bottom-pill-dock-bound")) {
+      scheduleBottomPillUpdate();
+      return;
+    }
+    document.documentElement.setAttribute("data-bottom-pill-dock-bound", "true");
+
+    window.addEventListener("scroll", scheduleBottomPillUpdate, { passive: true });
+    window.addEventListener("resize", scheduleBottomPillUpdate, { passive: true });
+
+    const mainContent = document.getElementById("main-content");
+    if (mainContent) {
+      const observer = new MutationObserver(() => {
+        refreshBottomPillRefs();
+        scheduleBottomPillUpdate();
+      });
+      observer.observe(mainContent, { childList: true });
+    }
+
+    updateBottomPillPosition();
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initNewsletter);
+    document.addEventListener("DOMContentLoaded", () => {
+      initNewsletter();
+      initBottomPillDocking();
+    });
   } else {
     initNewsletter();
+    initBottomPillDocking();
   }
 </script>

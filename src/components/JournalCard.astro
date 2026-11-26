@@ -21,18 +21,27 @@ const images = (entry.images && entry.images.length > 0)
 const totalSlides = images.length;
 const hasMultipleImages = totalSlides > 1;
 const displayNumber = String(index + 1).padStart(2, "0");
-const isAccentCategory = entry.category === "In Another Form";
+const entryCategories =
+  Array.isArray(entry.categories) && entry.categories.length > 0
+    ? entry.categories
+    : entry.category
+      ? [entry.category]
+      : [];
 
 const resolvedImages = images.map((img, imgIndex) => {
   const hasAsset = Boolean(img.asset?._id || img.asset?._ref);
   const src = hasAsset
     ? urlFor(img).width(1200).auto("format").url()
     : img.asset?.url || "";
+  const thumbSrc = hasAsset
+    ? urlFor(img).width(400).auto("format").url()
+    : img.asset?.url || "";
   const focalX = img.hotspot?.x != null ? Math.round(img.hotspot.x * 100) : 50;
   const focalY = img.hotspot?.y != null ? Math.round(img.hotspot.y * 100) : 50;
 
   return {
     src,
+    thumbSrc,
     alt: img.alt || `${entry.title} — image ${imgIndex + 1}`,
     objectPosition: `${focalX}% ${focalY}%`,
   };
@@ -55,7 +64,8 @@ const initialThumbSlots = hasMultipleImages
 <article
   class="journal-card"
   data-journal-card
-  data-category={entry.category}
+  data-order-index={index}
+  data-categories={entryCategories.join("||")}
   data-journal-id={entry._id}
   data-total-slides={totalSlides}
 >
@@ -72,9 +82,11 @@ const initialThumbSlots = hasMultipleImages
 
   <div class="journal-col-right">
     <div class="journal-category-wrap">
-      <span class={`journal-category-tag ${isAccentCategory ? "is-accent" : ""}`}>
-        {entry.category}
-      </span>
+      {entryCategories.map((cat) => (
+        <span class="journal-category-tag" data-category-badge data-badge-category={cat}>
+          {cat}
+        </span>
+      ))}
     </div>
 
     <div class="journal-media-stage">
@@ -83,6 +95,7 @@ const initialThumbSlots = hasMultipleImages
           {resolvedImages.map((img, imgIdx) => (
             <img
               src={img.src}
+              data-thumb-src={img.thumbSrc}
               alt={img.alt}
               class={`journal-slide-img ${imgIdx === 0 ? "is-active" : ""}`}
               data-slide-index={imgIdx}
@@ -109,7 +122,7 @@ const initialThumbSlots = hasMultipleImages
                   aria-label={`View image ${slot.targetIdx + 1} of ${totalSlides}`}
                 >
                   <img
-                    src={slot.src}
+                    src={slot.thumbSrc}
                     alt={slot.alt}
                     class="journal-thumb-img"
                     style={`object-position: ${slot.objectPosition};`}
@@ -149,6 +162,7 @@ const initialThumbSlots = hasMultipleImages
     gap: 0;
     align-items: flex-start;
     width: 100%;
+    contain: layout style;
   }
 
   .journal-card.is-filtered-out {
@@ -157,42 +171,51 @@ const initialThumbSlots = hasMultipleImages
 
   .journal-col-left {
     display: grid;
-    grid-template-columns: minmax(48px, 21%) minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns: minmax(48px, 25%) minmax(0, 1fr);
+    gap: var(--gutter);
     align-items: flex-start;
-    padding-right: 48px;
   }
 
   .journal-number {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-pill-sm);
+    background-color: var(--color-pill-frame);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: var(--text-size);
     line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
     color: var(--color-text-primary);
     user-select: none;
+    flex-shrink: 0;
   }
 
   .journal-copy {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-width: 400px;
+    gap: 20px;
+    max-width: 470px;
+    padding-right: 20px;
   }
 
   .journal-title {
     font-size: var(--text-size);
-    font-weight: 500;
+    font-weight: 400;
     line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
     color: var(--color-text-primary);
+    padding-top: 6px;
     margin: 0;
   }
 
   .journal-excerpt {
     font-size: var(--text-size);
     font-weight: 400;
-    line-height: 1.3;
+    line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
-    color: rgba(0, 0, 0, 0.55);
+    color: var(--color-gris-03);
     margin: 0;
   }
 
@@ -208,14 +231,18 @@ const initialThumbSlots = hasMultipleImages
     top: 0;
     right: 0;
     z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 55%;
   }
 
   .journal-category-tag {
-    height: 24px;
-    padding: 0 11px;
+    height: var(--header-height);
+    padding: 0 14px;
     border-radius: var(--radius-pill);
     background-color: var(--color-pill-light);
-    color: rgba(0, 0, 0, 0.42);
+    color: var(--color-gris-03);
     font-size: var(--text-size);
     line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
@@ -225,23 +252,23 @@ const initialThumbSlots = hasMultipleImages
     white-space: nowrap;
   }
 
-  .journal-category-tag.is-accent {
-    background-color: rgba(235, 87, 87, 0.12);
-    color: #e05252;
+  .journal-category-tag.is-active-filter {
+    background-color: var(--color-red-pill);
+    color: var(--color-red);
   }
 
   .journal-media-stage {
     display: flex;
     align-items: flex-end;
-    gap: 20px;
+    gap: 48px;
     width: 100%;
     min-width: 0;
   }
 
   .journal-active-group {
+    position: relative;
     display: flex;
     align-items: flex-start;
-    gap: 8px;
     flex: 0 0 auto;
   }
 
@@ -252,7 +279,6 @@ const initialThumbSlots = hasMultipleImages
     overflow: hidden;
     position: relative;
     background-color: rgba(240, 240, 240, 0.4);
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
     touch-action: pan-y;
   }
 
@@ -276,33 +302,35 @@ const initialThumbSlots = hasMultipleImages
   }
 
   .journal-counter {
+    position: absolute;
+    top: 2px;
+    left: calc(100% + 8px);
     font-size: var(--text-size);
     line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
     color: var(--color-text-primary);
     white-space: nowrap;
     user-select: none;
-    flex-shrink: 0;
-    padding-top: 2px;
+    pointer-events: none;
   }
 
   .journal-thumbs-viewport {
     flex: 1 1 0%;
     min-width: 0;
     overflow: hidden;
+    margin-right: calc(-1 * var(--page-margin));
   }
 
   .journal-thumbs-track {
     display: flex;
     align-items: flex-end;
-    gap: 14px;
-    will-change: transform;
+    gap: 48px;
   }
 
   .journal-thumb-item {
+    position: relative;
     display: flex;
     align-items: flex-start;
-    gap: 6px;
     flex-shrink: 0;
   }
 
@@ -316,8 +344,12 @@ const initialThumbSlots = hasMultipleImages
     background-color: rgba(240, 240, 240, 0.4);
     cursor: pointer;
     position: relative;
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    opacity: 0.5;
     transition: opacity 0.25s ease;
+  }
+
+  .journal-thumb-btn:hover {
+    opacity: 0.85;
   }
 
   .journal-thumb-img {
@@ -339,10 +371,6 @@ const initialThumbSlots = hasMultipleImages
   }
 
   @media (max-width: 1024px) and (min-width: 769px) {
-    .journal-col-left {
-      padding-right: 24px;
-    }
-
     .journal-active-frame {
       width: clamp(190px, 23vw, 260px);
     }
@@ -378,7 +406,7 @@ const initialThumbSlots = hasMultipleImages
 
     .journal-active-frame {
       width: 100%;
-      aspect-ratio: 1 / 1.03;
+      aspect-ratio: 1 / 1;
     }
 
     .journal-active-counter,
@@ -393,14 +421,14 @@ const initialThumbSlots = hasMultipleImages
       align-items: center;
       justify-content: center;
       gap: 7px;
-      margin-top: 12px;
+      margin-top: 20px;
     }
 
     .journal-dot {
-      width: 6px;
-      height: 6px;
+      width: var(--dot-size);
+      height: var(--dot-size);
       border-radius: 50%;
-      background-color: #d6d6d6;
+      background-color: var(--color-text-muted);
       border: none;
       padding: 0;
       cursor: pointer;
@@ -408,16 +436,16 @@ const initialThumbSlots = hasMultipleImages
     }
 
     .journal-dot.is-active {
-      background-color: #666666;
+      background-color: var(--color-gris-03);
     }
 
     .journal-number {
       order: 3;
       margin-top: 14px;
-      height: 22px;
-      min-width: 28px;
-      padding: 0 8px;
-      border-radius: 11px;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: var(--radius-pill-sm);
       background-color: var(--color-pill-frame);
       display: inline-flex;
       align-items: center;
@@ -427,15 +455,22 @@ const initialThumbSlots = hasMultipleImages
 
     .journal-copy {
       order: 4;
-      margin-top: 10px;
+      margin-top: 12px;
       max-width: 100%;
-      gap: 8px;
+      padding-right: 0;
+      gap: 12px;
+    }
+
+    .journal-title {
+      padding-top: 0;
     }
 
     .journal-category-wrap {
       position: static;
       order: 5;
-      margin-top: 12px;
+      margin-top: 20px;
+      justify-content: flex-start;
+      max-width: 100%;
     }
   }
 </style>

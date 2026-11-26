@@ -19,7 +19,8 @@ export interface JournalEntry {
   _type?: "journal";
   title: string;
   excerpt: string;
-  category: string;
+  categories: string[];
+  category?: string;
   images: ProjectImage[];
   orderRank?: string | number;
 }
