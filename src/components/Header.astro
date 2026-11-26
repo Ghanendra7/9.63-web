@@ -1,11 +1,14 @@
 ---
 import { JOURNAL_CATEGORIES } from "../types/journal";
+import { getSiteAudio } from "../lib/audio";
 
 interface Props {
   currentPath?: string;
 }
 
 const { currentPath = Astro.url.pathname } = Astro.props;
+const siteAudio = await getSiteAudio();
+const hasAudio = Boolean(siteAudio?.url);
 
 const navItems = [
   { href: "/approach", label: "Approach", initial: "A", key: "approach" },
@@ -32,7 +35,12 @@ const isCol8 = initialColView === "8";
 const isCol3 = initialColView === "3";
 ---
 
-<header class="site-header" id="site-header">
+<header
+  class="site-header"
+  id="site-header"
+  data-audio-url={siteAudio?.url || ""}
+  data-audio-title={siteAudio?.title || ""}
+>
   <div class="header-inner desktop-only">
     <div class="header-left">
       <a href="/" class="brand-pill" id="brand-link" aria-label="9.63 Home">
@@ -40,7 +48,7 @@ const isCol3 = initialColView === "3";
           <svg width="9" height="14" viewBox="0 0 8 12.6655" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7.24289 4.78922V4.71048C7.24289 4.29478 7.46058 4.07709 7.87628 4.07709H7.91565V3.83971H7.87628C7.46058 3.83971 7.24289 3.62202 7.24289 3.20632V3.12758C7.24289 2.71188 7.46058 2.49419 7.87628 2.49419H7.91565V2.25682H7.87628C7.46058 2.25682 7.24289 2.03912 7.24289 1.62343V1.58406H7.00551V1.62343C7.00551 2.03912 6.78782 2.25682 6.37212 2.25682H6.33275V2.49419H6.37212C6.78782 2.49419 7.00551 2.71188 7.00551 3.12758V3.20632C7.00551 3.62202 6.78782 3.83971 6.37212 3.83971H6.33275V4.07709H6.37212C6.78782 4.07709 7.00551 4.29478 7.00551 4.71048V4.78922C7.00551 5.20492 6.78782 5.42261 6.37212 5.42261H6.33275V5.65999H6.37212C6.78782 5.65999 7.00551 5.87768 7.00551 6.29338V6.37212C7.00551 6.78782 6.78782 7.00551 6.37212 7.00551H6.29338C5.87768 7.00551 5.65999 6.78782 5.65999 6.37212V6.33275H5.42261V6.37212C5.42261 6.78782 5.20492 7.00551 4.78922 7.00551H4.71048C4.29478 7.00551 4.07709 6.78782 4.07709 6.37212V6.33275H3.83971V6.37212C3.83971 6.78782 3.62202 7.00551 3.20632 7.00551H3.12758C2.71188 7.00551 2.49419 6.78782 2.49419 6.37212V6.33275H2.25682V6.37212C2.25682 6.78782 2.03912 7.00551 1.62343 7.00551H1.58406V7.24289H1.62343C2.03912 7.24289 2.25682 7.46058 2.25682 7.87628V7.91565H2.49419V7.87628C2.49419 7.46058 2.71188 7.24289 3.12758 7.24289H3.20632C3.62202 7.24289 3.83971 7.46058 3.83971 7.87628V7.91565H4.07709V7.87628C4.07709 7.46058 4.29478 7.24289 4.71048 7.24289H4.78922C5.20492 7.24289 5.42261 7.46058 5.42261 7.87628V7.91565H5.65999V7.87628C5.65999 7.46058 5.87768 7.24289 6.29338 7.24289H6.37212C6.78782 7.24289 7.00551 7.46058 7.00551 7.87628V7.95502C7.00551 8.37072 6.78782 8.58841 6.37212 8.58841H6.33275V8.82578H6.37212C6.78782 8.82578 7.00551 9.04348 7.00551 9.45918V9.53792C7.00551 9.95361 6.78782 10.1713 6.37212 10.1713H6.33275V10.4087H6.37212C6.78782 10.4087 7.00551 10.6264 7.00551 11.0421V11.0814H7.24289V11.0421C7.24289 10.6264 7.46058 10.4087 7.87628 10.4087H7.91565V10.1713H7.87628C7.46058 10.1713 7.24289 9.95361 7.24289 9.53792V9.45918C7.24289 9.04348 7.46058 8.82578 7.87628 8.82578H7.91565V8.58841H7.87628C7.46058 8.58841 7.24289 8.37072 7.24289 7.95502V7.87628C7.24289 7.46058 7.46058 7.24289 7.87628 7.24289H7.91565V7.00551H7.87628C7.46058 7.00551 7.24289 6.78782 7.24289 6.37212V6.29338C7.24289 5.87768 7.46058 5.65999 7.87628 5.65999H7.91565V5.42261H7.87628C7.46058 5.42261 7.24289 5.20492 7.24289 4.78922ZM0.910137 4.78922V4.71048C0.910137 4.29478 1.12783 4.07709 1.54353 4.07709H1.5829V3.83971H1.54353C1.12783 3.83971 0.910137 3.62202 0.910137 3.20632V3.12758C0.910137 2.71188 1.12783 2.49419 1.54353 2.49419H1.5829V2.25682H1.54353C1.12783 2.25682 0.910137 2.03912 0.910137 1.62343V1.58406H0.67276V1.62343C0.67276 2.03912 0.455069 2.25682 0.0393698 2.25682H0V2.49419H0.0393698C0.455069 2.49419 0.67276 2.71188 0.67276 3.12758V3.20632C0.67276 3.62202 0.455069 3.83971 0.0393698 3.83971H0V4.07709H0.0393698C0.455069 4.07709 0.67276 4.29478 0.67276 4.71048V4.78922C0.67276 5.20492 0.455069 5.42261 0.0393698 5.42261H0V5.65999H0.0393698C0.455069 5.65999 0.67276 5.87768 0.67276 6.29338V6.33275H0.910137V6.29338C0.910137 5.87768 1.12783 5.65999 1.54353 5.65999H1.5829V5.42261H1.54353C1.12783 5.42261 0.910137 5.20492 0.910137 4.78922ZM5.65999 12.6655V12.6261C5.65999 12.2104 5.87768 11.9927 6.29338 11.9927H6.33275V11.7554H6.29338C5.87768 11.7554 5.65999 11.5377 5.65999 11.122V11.0826H5.42261V11.122C5.42261 11.5377 5.20492 11.7554 4.78922 11.7554H4.71048C4.29478 11.7554 4.07709 11.5377 4.07709 11.122V11.0826H3.83971V11.122C3.83971 11.5377 3.62202 11.7554 3.20632 11.7554H3.12758C2.71188 11.7554 2.49419 11.5377 2.49419 11.122V11.0826H2.25682V11.122C2.25682 11.5377 2.03912 11.7554 1.62343 11.7554H1.58406V11.9927H1.62343C2.03912 11.9927 2.25682 12.2104 2.25682 12.6261V12.6655H2.49419V12.6261C2.49419 12.2104 2.71188 11.9927 3.12758 11.9927H3.20632C3.62202 11.9927 3.83971 12.2104 3.83971 12.6261V12.6655H4.07709V12.6261C4.07709 12.2104 4.29478 11.9927 4.71048 11.9927H4.78922C5.20492 11.9927 5.42261 12.2104 5.42261 12.6261V12.6655H5.65999ZM5.65999 1.5829V1.54353C5.65999 1.12783 5.87768 0.910137 6.29338 0.910137H6.33275V0.67276H6.29338C5.87768 0.67276 5.65999 0.455069 5.65999 0.0393698V0H5.42261V0.0393698C5.42261 0.455069 5.20492 0.67276 4.78922 0.67276H4.71048C4.29478 0.67276 4.07709 0.455069 4.07709 0.0393698V0H3.83971V0.0393698C3.83971 0.455069 3.62202 0.67276 3.20632 0.67276H3.12758C2.71188 0.67276 2.49419 0.455069 2.49419 0.0393698V0H2.25682V0.0393698C2.25682 0.455069 2.03912 0.67276 1.62343 0.67276H1.58406V0.910137H1.62343C2.03912 0.910137 2.25682 1.12783 2.25682 1.54353V1.5829H2.49419V1.54353C2.49419 1.12783 2.71188 0.910137 3.12758 0.910137H3.20632C3.62202 0.910137 3.83971 1.12783 3.83971 1.54353V1.5829H4.07709V1.54353C4.07709 1.12783 4.29478 0.910137 4.71048 0.910137H4.78922C5.20492 0.910137 5.42261 1.12783 5.42261 1.54353V1.5829H5.65999ZM0.910137 11.0826V11.0432C0.910137 10.6275 1.12783 10.4098 1.54353 10.4098H1.5829V10.1725H1.54353C1.12783 10.1725 0.910137 9.95477 0.910137 9.53907V9.4997H0.67276V9.53907C0.67276 9.95477 0.455069 10.1725 0.0393698 10.1725H0V10.4098H0.0393698C0.455069 10.4098 0.67276 10.6275 0.67276 11.0432V11.0826H0.910137Z" fill="black"/>
           </svg>
-          <svg width="2" height="14" viewBox="80.9 0 1.7 12.6655" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class="brand-dot-svg" width="2" height="4" viewBox="80.97 9.49 1.59 3.18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M81.8824 11.122C81.8824 11.5377 82.1001 11.7554 82.5158 11.7554H82.5552V11.9927H82.5158C82.1001 11.9927 81.8824 12.2104 81.8824 12.6261V12.6655H81.6451V12.6261C81.6451 12.2104 81.4274 11.9927 81.0117 11.9927H80.9723V11.7554H81.0117C81.4274 11.7554 81.6451 11.5377 81.6451 11.122V11.0432C81.6451 10.6275 81.4274 10.4098 81.0117 10.4098H80.9723V10.1725H81.0117C81.4274 10.1725 81.6451 9.95477 81.6451 9.53907V9.4997H81.8824V9.53907C81.8824 9.95477 82.1001 10.1725 82.5158 10.1725H82.5552V10.4098H82.5158C82.1001 10.4098 81.8824 10.6275 81.8824 11.0432V11.122Z" fill="black"/>
           </svg>
           <svg width="9" height="14" viewBox="155.6 0 8 12.6655" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +66,7 @@ const isCol3 = initialColView === "3";
     </div>
 
     <div class="header-right">
-      <nav class="nav-bar" id="main-nav">
+      <nav class={`nav-bar ${hasAudio ? "" : "has-no-audio"}`} id="main-nav">
         {navItems.map((item) => {
           const isActive = activeHref === item.href || (item.href !== "/" && activeHref.startsWith(item.href + "/"));
           return (
@@ -77,8 +85,17 @@ const isCol3 = initialColView === "3";
           );
         })}
 
-        <button type="button" class="nav-pill nav-play-btn" id="audio-toggle" aria-label="Toggle Music Player">
-          <span class="play-icon" />
+        <button
+          type="button"
+          class={`nav-pill nav-play-btn ${hasAudio ? "" : "is-hidden"}`}
+          id="audio-toggle"
+          aria-label={siteAudio ? `Play ${siteAudio.title}` : "Play audio"}
+          aria-pressed="false"
+        >
+          <span class="audio-btn-inner">
+            <span class="audio-title" id="audio-title">{siteAudio?.title || ""}</span>
+            <span class="play-icon" aria-hidden="true" />
+          </span>
         </button>
       </nav>
 
@@ -147,8 +164,14 @@ const isCol3 = initialColView === "3";
       >
         Filter
       </button>
-      <button type="button" class="nav-pill nav-play-btn" id="mobile-audio-toggle" aria-label="Toggle Music Player">
-        <span class="play-icon" />
+      <button
+        type="button"
+        class={`nav-pill nav-play-btn mobile-play-btn ${hasAudio ? "" : "is-hidden"}`}
+        id="mobile-audio-toggle"
+        aria-label={siteAudio ? `Play ${siteAudio.title}` : "Play audio"}
+        aria-pressed="false"
+      >
+        <span class="play-icon" aria-hidden="true" />
       </button>
       <button type="button" class={`mobile-col-btn ${isHomePage ? "" : "is-hidden"}`} id="mobile-col-toggle" aria-label="Toggle Column View">
         {isCol3 ? "1" : "3"}
@@ -188,7 +211,7 @@ const isCol3 = initialColView === "3";
           <svg width="8" height="12.67" viewBox="0 0 8 12.6655" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7.24289 4.78922V4.71048C7.24289 4.29478 7.46058 4.07709 7.87628 4.07709H7.91565V3.83971H7.87628C7.46058 3.83971 7.24289 3.62202 7.24289 3.20632V3.12758C7.24289 2.71188 7.46058 2.49419 7.87628 2.49419H7.91565V2.25682H7.87628C7.46058 2.25682 7.24289 2.03912 7.24289 1.62343V1.58406H7.00551V1.62343C7.00551 2.03912 6.78782 2.25682 6.37212 2.25682H6.33275V2.49419H6.37212C6.78782 2.49419 7.00551 2.71188 7.00551 3.12758V3.20632C7.00551 3.62202 6.78782 3.83971 6.37212 3.83971H6.33275V4.07709H6.37212C6.78782 4.07709 7.00551 4.29478 7.00551 4.71048V4.78922C7.00551 5.20492 6.78782 5.42261 6.37212 5.42261H6.33275V5.65999H6.37212C6.78782 5.65999 7.00551 5.87768 7.00551 6.29338V6.37212C7.00551 6.78782 6.78782 7.00551 6.37212 7.00551H6.29338C5.87768 7.00551 5.65999 6.78782 5.65999 6.37212V6.33275H5.42261V6.37212C5.42261 6.78782 5.20492 7.00551 4.78922 7.00551H4.71048C4.29478 7.00551 4.07709 6.78782 4.07709 6.37212V6.33275H3.83971V6.37212C3.83971 6.78782 3.62202 7.00551 3.20632 7.00551H3.12758C2.71188 7.00551 2.49419 6.78782 2.49419 6.37212V6.33275H2.25682V6.37212C2.25682 6.78782 2.03912 7.00551 1.62343 7.00551H1.58406V7.24289H1.62343C2.03912 7.24289 2.25682 7.46058 2.25682 7.87628V7.91565H2.49419V7.87628C2.49419 7.46058 2.71188 7.24289 3.12758 7.24289H3.20632C3.62202 7.24289 3.83971 7.46058 3.83971 7.87628V7.91565H4.07709V7.87628C4.07709 7.46058 4.29478 7.24289 4.71048 7.24289H4.78922C5.20492 7.24289 5.42261 7.46058 5.42261 7.87628V7.91565H5.65999V7.87628C5.65999 7.46058 5.87768 7.24289 6.29338 7.24289H6.37212C6.78782 7.24289 7.00551 7.46058 7.00551 7.87628V7.95502C7.00551 8.37072 6.78782 8.58841 6.37212 8.58841H6.33275V8.82578H6.37212C6.78782 8.82578 7.00551 9.04348 7.00551 9.45918V9.53792C7.00551 9.95361 6.78782 10.1713 6.37212 10.1713H6.33275V10.4087H6.37212C6.78782 10.4087 7.00551 10.6264 7.00551 11.0421V11.0814H7.24289V11.0421C7.24289 10.6264 7.46058 10.4087 7.87628 10.4087H7.91565V10.1713H7.87628C7.46058 10.1713 7.24289 9.95361 7.24289 9.53792V9.45918C7.24289 9.04348 7.46058 8.82578 7.87628 8.82578H7.91565V8.58841H7.87628C7.46058 8.58841 7.24289 8.37072 7.24289 7.95502V7.87628C7.24289 7.46058 7.46058 7.24289 7.87628 7.24289H7.91565V7.00551H7.87628C7.46058 7.00551 7.24289 6.78782 7.24289 6.37212V6.29338C7.24289 5.87768 7.46058 5.65999 7.87628 5.65999H7.91565V5.42261H7.87628C7.46058 5.42261 7.24289 5.20492 7.24289 4.78922ZM0.910137 4.78922V4.71048C0.910137 4.29478 1.12783 4.07709 1.54353 4.07709H1.5829V3.83971H1.54353C1.12783 3.83971 0.910137 3.62202 0.910137 3.20632V3.12758C0.910137 2.71188 1.12783 2.49419 1.54353 2.49419H1.5829V2.25682H1.54353C1.12783 2.25682 0.910137 2.03912 0.910137 1.62343V1.58406H0.67276V1.62343C0.67276 2.03912 0.455069 2.25682 0.0393698 2.25682H0V2.49419H0.0393698C0.455069 2.49419 0.67276 2.71188 0.67276 3.12758V3.20632C0.67276 3.62202 0.455069 3.83971 0.0393698 3.83971H0V4.07709H0.0393698C0.455069 4.07709 0.67276 4.29478 0.67276 4.71048V4.78922C0.67276 5.20492 0.455069 5.42261 0.0393698 5.42261H0V5.65999H0.0393698C0.455069 5.65999 0.67276 5.87768 0.67276 6.29338V6.33275H0.910137V6.29338C0.910137 5.87768 1.12783 5.65999 1.54353 5.65999H1.5829V5.42261H1.54353C1.12783 5.42261 0.910137 5.20492 0.910137 4.78922ZM5.65999 12.6655V12.6261C5.65999 12.2104 5.87768 11.9927 6.29338 11.9927H6.33275V11.7554H6.29338C5.87768 11.7554 5.65999 11.5377 5.65999 11.122V11.0826H5.42261V11.122C5.42261 11.5377 5.20492 11.7554 4.78922 11.7554H4.71048C4.29478 11.7554 4.07709 11.5377 4.07709 11.122V11.0826H3.83971V11.122C3.83971 11.5377 3.62202 11.7554 3.20632 11.7554H3.12758C2.71188 11.7554 2.49419 11.5377 2.49419 11.122V11.0826H2.25682V11.122C2.25682 11.5377 2.03912 11.7554 1.62343 11.7554H1.58406V11.9927H1.62343C2.03912 11.9927 2.25682 12.2104 2.25682 12.6261V12.6655H2.49419V12.6261C2.49419 12.2104 2.71188 11.9927 3.12758 11.9927H3.20632C3.62202 11.9927 3.83971 12.2104 3.83971 12.6261V12.6655H4.07709V12.6261C4.07709 12.2104 4.29478 11.9927 4.71048 11.9927H4.78922C5.20492 11.9927 5.42261 12.2104 5.42261 12.6261V12.6655H5.65999ZM5.65999 1.5829V1.54353C5.65999 1.12783 5.87768 0.910137 6.29338 0.910137H6.33275V0.67276H6.29338C5.87768 0.67276 5.65999 0.455069 5.65999 0.0393698V0H5.42261V0.0393698C5.42261 0.455069 5.20492 0.67276 4.78922 0.67276H4.71048C4.29478 0.67276 4.07709 0.455069 4.07709 0.0393698V0H3.83971V0.0393698C3.83971 0.455069 3.62202 0.67276 3.20632 0.67276H3.12758C2.71188 0.67276 2.49419 0.455069 2.49419 0.0393698V0H2.25682V0.0393698C2.25682 0.455069 2.03912 0.67276 1.62343 0.67276H1.58406V0.910137H1.62343C2.03912 0.910137 2.25682 1.12783 2.25682 1.54353V1.5829H2.49419V1.54353C2.49419 1.12783 2.71188 0.910137 3.12758 0.910137H3.20632C3.62202 0.910137 3.83971 1.12783 3.83971 1.54353V1.5829H4.07709V1.54353C4.07709 1.12783 4.29478 0.910137 4.71048 0.910137H4.78922C5.20492 0.910137 5.42261 1.12783 5.42261 1.54353V1.5829H5.65999ZM0.910137 11.0826V11.0432C0.910137 10.6275 1.12783 10.4098 1.54353 10.4098H1.5829V10.1725H1.54353C1.12783 10.1725 0.910137 9.95477 0.910137 9.53907V9.4997H0.67276V9.53907C0.67276 9.95477 0.455069 10.1725 0.0393698 10.1725H0V10.4098H0.0393698C0.455069 10.4098 0.67276 10.6275 0.67276 11.0432V11.0826H0.910137Z" fill="black"/>
           </svg>
-          <svg width="2" height="12.67" viewBox="80.9 0 1.7 12.6655" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class="brand-dot-svg" width="2" height="4" viewBox="80.97 9.49 1.59 3.18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M81.8824 11.122C81.8824 11.5377 82.1001 11.7554 82.5158 11.7554H82.5552V11.9927H82.5158C82.1001 11.9927 81.8824 12.2104 81.8824 12.6261V12.6655H81.6451V12.6261C81.6451 12.2104 81.4274 11.9927 81.0117 11.9927H80.9723V11.7554H81.0117C81.4274 11.7554 81.6451 11.5377 81.6451 11.122V11.0432C81.6451 10.6275 81.4274 10.4098 81.0117 10.4098H80.9723V10.1725H81.0117C81.4274 10.1725 81.6451 9.95477 81.6451 9.53907V9.4997H81.8824V9.53907C81.8824 9.95477 82.1001 10.1725 82.5158 10.1725H82.5552V10.4098H82.5158C82.1001 10.4098 81.8824 10.6275 81.8824 11.0432V11.122Z" fill="black"/>
           </svg>
           <svg width="8" height="12.67" viewBox="155.6 0 8 12.6655" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -298,6 +321,10 @@ const isCol3 = initialColView === "3";
     flex-shrink: 0;
   }
 
+  .brand-logo svg.brand-dot-svg {
+    height: 3.5px;
+  }
+
   .header-right {
     display: flex;
     flex-direction: column;
@@ -342,7 +369,7 @@ const isCol3 = initialColView === "3";
       background-color 0.25s ease;
   }
 
-  .nav-pill:hover:not(.is-active) {
+  .nav-pill:hover:not(.is-active):not(.nav-play-btn) {
     flex: 0 0 95px;
     width: 95px;
     background-color: var(--color-pill-frame);
@@ -361,6 +388,11 @@ const isCol3 = initialColView === "3";
       flex-basis var(--nav-expand-duration) var(--ease-nav),
       width var(--nav-expand-duration) var(--ease-nav),
       background-color 0.3s ease;
+  }
+
+  .nav-bar.has-no-audio .nav-pill.is-active {
+    flex-basis: calc(100% - 90px);
+    width: calc(100% - 90px);
   }
 
   .nav-initial {
@@ -425,8 +457,45 @@ const isCol3 = initialColView === "3";
     flex: 0 0 30px;
     width: 30px;
     min-width: 30px;
-    aspect-ratio: 1 / 1;
     margin-left: auto;
+    justify-content: flex-end;
+    padding: 0 9.75px 0 0;
+  }
+
+  .nav-play-btn.is-hidden {
+    display: none;
+  }
+
+  .nav-play-btn:hover,
+  .nav-play-btn.is-playing {
+    flex: 0 0 var(--audio-expanded-width, auto);
+    width: var(--audio-expanded-width, auto);
+    max-width: calc(100% - 190px);
+    padding-left: 14px;
+    background-color: var(--color-pill-active);
+    transition:
+      flex-basis var(--nav-expand-duration) var(--ease-nav),
+      width var(--nav-expand-duration) var(--ease-nav),
+      background-color 0.25s ease;
+  }
+
+  .nav-play-btn:hover {
+    background-color: var(--color-pill-frame);
+    transition:
+      flex-basis var(--nav-hover-duration) var(--ease-nav),
+      width var(--nav-hover-duration) var(--ease-nav),
+      background-color 0.25s ease;
+  }
+
+  .audio-btn-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    pointer-events: none;
   }
 
   .play-icon {
@@ -434,11 +503,55 @@ const isCol3 = initialColView === "3";
     height: var(--dot-size);
     border-radius: 50%;
     background-color: #828282;
-    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    pointer-events: none;
+    transition: background-color 0.25s ease;
   }
 
-  .nav-play-btn:hover .play-icon {
-    transform: scale(1.15);
+  .nav-play-btn:hover:not(.is-playing) .play-icon {
+    background-color: var(--color-text-primary);
+  }
+
+  .audio-title {
+    min-width: 0;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    pointer-events: none;
+    line-height: 1;
+    color: var(--color-gris-03);
+    transition: opacity 0.15s ease;
+  }
+
+  .nav-play-btn.is-playing .play-icon {
+    background-color: var(--color-red);
+  }
+
+  .nav-play-btn:hover .audio-title,
+  .nav-play-btn.is-playing .audio-title {
+    opacity: 1;
+    transition: opacity calc(var(--nav-hover-duration) * 0.7) var(--ease-nav) calc(var(--nav-hover-duration) * 0.15);
+  }
+
+  .nav-play-btn.is-playing .audio-title {
+    transition: opacity calc(var(--nav-expand-duration) * 0.6) var(--ease-nav) calc(var(--nav-expand-duration) * 0.12);
+  }
+
+  .mobile-play-btn {
+    margin-left: 0;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .mobile-play-btn:hover,
+  .mobile-play-btn.is-playing {
+    flex: 0 0 30px;
+    width: 30px;
+    max-width: 30px;
+    padding: 0;
+    background-color: var(--color-pill-light);
   }
 
   .sub-bar {
@@ -856,6 +969,10 @@ const isCol3 = initialColView === "3";
     flex-shrink: 0;
   }
 
+  .mobile-menu-brand-logo svg.brand-dot-svg {
+    height: 3.2px;
+  }
+
   .mobile-menu-close-btn {
     width: 65px;
     height: 100%;
@@ -945,6 +1062,8 @@ const isCol3 = initialColView === "3";
 </style>
 
 <script>
+  import { initAudioPlayer } from "../scripts/audio";
+
   function setupNav() {
     const navPills = document.querySelectorAll<HTMLAnchorElement>("#main-nav a.nav-pill");
     const brandLink = document.getElementById("brand-link");
@@ -1030,9 +1149,6 @@ const isCol3 = initialColView === "3";
         mobileMenuOverlay.classList.add("is-open");
         mobileMenuOverlay.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
-        if ((window as any).__lenis) {
-          (window as any).__lenis.stop();
-        }
       }
     }
 
@@ -1041,9 +1157,6 @@ const isCol3 = initialColView === "3";
         mobileMenuOverlay.classList.remove("is-open");
         mobileMenuOverlay.setAttribute("aria-hidden", "true");
         document.body.style.overflow = "";
-        if ((window as any).__lenis) {
-          (window as any).__lenis.start();
-        }
       }
     }
 
@@ -1217,8 +1330,12 @@ const isCol3 = initialColView === "3";
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setupNav);
+    document.addEventListener("DOMContentLoaded", () => {
+      setupNav();
+      initAudioPlayer();
+    });
   } else {
     setupNav();
+    initAudioPlayer();
   }
 </script>

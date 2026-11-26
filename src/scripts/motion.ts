@@ -1,24 +1,7 @@
 import barba from "@barba/core";
 import { gsap } from "gsap";
-import Lenis from "lenis";
-
-let lenis: Lenis | null = null;
-
-export function initSmoothScroll(): Lenis {
-  if (lenis) return lenis;
-
-  lenis = new Lenis({
-    autoRaf: true,
-  });
-
-  (window as any).__lenis = lenis;
-
-  return lenis;
-}
 
 export function initPageTransitions() {
-  const scrollInstance = initSmoothScroll();
-
   barba.init({
     transitions: [
       {
@@ -31,8 +14,7 @@ export function initPageTransitions() {
           });
         },
         enter({ next }) {
-          scrollInstance.scrollTo(0, { immediate: true });
-          scrollInstance.resize();
+          window.scrollTo(0, 0);
 
           if (typeof window !== "undefined" && (window as any).syncNavState) {
             (window as any).syncNavState(window.location.pathname);

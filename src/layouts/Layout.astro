@@ -27,12 +27,31 @@ const {
   </head>
   <body data-barba="wrapper">
     <Header />
+    <div class="audio-playing-line" id="audio-playing-line" aria-hidden="true"></div>
 
     <main id="main-content" data-barba="container" data-barba-namespace={namespace}>
       <slot />
     </main>
 
     <BottomPill />
+
+    <style>
+      .audio-playing-line {
+        display: none;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 30%;
+        width: 1px;
+        background-color: var(--color-red);
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      .audio-playing-line.is-playing {
+        display: block;
+      }
+    </style>
 
     <script>
       import { initPageTransitions } from "../scripts/motion";

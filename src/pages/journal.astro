@@ -120,10 +120,6 @@ const journals = await getJournals();
         });
         feed.appendChild(card);
       });
-
-      if ((window as any).__lenis) {
-        (window as any).__lenis.resize();
-      }
     }
 
     // Bind filter listener to the currently mounted feed (safe across Barba navigations)

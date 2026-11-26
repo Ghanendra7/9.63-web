@@ -28,8 +28,12 @@ export default defineConfig({
               S,
               context,
             }),
+            S.listItem()
+              .title("Music")
+              .id("siteAudio")
+              .child(S.document().schemaType("siteAudio").documentId("siteAudio")),
             ...S.documentTypeListItems().filter(
-              (listItem) => !["project", "journal"].includes(listItem.getId() || "")
+              (listItem) => !["project", "journal", "siteAudio"].includes(listItem.getId() || "")
             ),
           ]);
       },
