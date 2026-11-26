@@ -27,7 +27,7 @@ const { project, projectNumber, slideCount } = Astro.props;
 const coverUrl = project.coverImage?.asset?.url || (project.coverImage ? urlFor(project.coverImage).width(1600).auto("format").url() : "/placeholders/pd1.png");
 ---
 
-<Layout title={`${project.title} — 9.63`} namespace="project">
+<Layout title={`${project.title} | 9.63`} namespace="project">
   <div class="project-page-container">
     <div class="project-header">
       <div class="project-meta-top">

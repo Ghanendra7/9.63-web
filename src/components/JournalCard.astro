@@ -42,7 +42,7 @@ const resolvedImages = images.map((img, imgIndex) => {
   return {
     src,
     thumbSrc,
-    alt: img.alt || `${entry.title} — image ${imgIndex + 1}`,
+    alt: img.alt || `${entry.title} | image ${imgIndex + 1}`,
     objectPosition: `${focalX}% ${focalY}%`,
   };
 });

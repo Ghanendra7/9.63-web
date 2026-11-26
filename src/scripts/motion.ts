@@ -1,5 +1,6 @@
 import barba from "@barba/core";
 import { gsap } from "gsap";
+import { initProjectGalleries } from "./projectGalleries";
 
 export function initPageTransitions() {
   barba.init({
@@ -90,6 +91,8 @@ export function initPageTransitions() {
     if (typeof window !== "undefined" && (window as any).syncNavState) {
       (window as any).syncNavState(data.next.url.path || window.location.pathname);
     }
+
+    initProjectGalleries();
 
     return Promise.all(stylePromises);
   });

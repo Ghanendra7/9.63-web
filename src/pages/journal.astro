@@ -7,7 +7,7 @@ import { getJournals } from "../lib/journals";
 const journals = await getJournals();
 ---
 
-<Layout title="9.63 — Journal" namespace="journal">
+<Layout title="9.63 | Journal" namespace="journal">
   <div class="journal-container" id="journal-page-root">
     <section class="journal-feed" id="journal-feed" aria-label="Journal Entries">
       {journals.map((entry, index) => (
