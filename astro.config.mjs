@@ -6,6 +6,11 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
+  vite: {
+    build: {
+      cssMinify: false,
+    },
+  },
   integrations: [
     sanity({
       projectId: "0jfix9cd",
