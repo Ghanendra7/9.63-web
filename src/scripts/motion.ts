@@ -1,6 +1,8 @@
 import barba from "@barba/core";
 import { gsap } from "gsap";
 import { initProjectGalleries } from "./projectGalleries";
+import { initJournalPage } from "./journalPage";
+import { initFeedViewSwitcher } from "./feedViewSwitcher";
 
 export function initPageTransitions() {
   barba.init({
@@ -93,6 +95,8 @@ export function initPageTransitions() {
     }
 
     initProjectGalleries();
+    initJournalPage();
+    initFeedViewSwitcher();
 
     return Promise.all(stylePromises);
   });
