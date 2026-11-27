@@ -139,11 +139,11 @@ export function initProjectGalleries() {
           Math.abs(diffX) > Math.abs(diffY)
         ) {
           if (diffX < 0) {
-            // Swipe left -> next image
-            setSlide(Math.min(total - 1, currentIdx + 1));
+            // Swipe left -> next image (wrap around)
+            setSlide((currentIdx + 1) % total);
           } else {
-            // Swipe right -> previous image
-            setSlide(Math.max(0, currentIdx - 1));
+            // Swipe right -> previous image (wrap around)
+            setSlide((currentIdx - 1 + total) % total);
           }
         }
 
