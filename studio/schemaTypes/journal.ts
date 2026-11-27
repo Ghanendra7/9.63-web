@@ -51,7 +51,6 @@ export const journalType = defineType({
     defineField({
       name: "images",
       title: "Images",
-      description: "First image is shown as active initially; additional images appear in the slider.",
       type: "array",
       of: [
         {

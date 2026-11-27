@@ -273,11 +273,11 @@ const isCol3 = initialColView === "3";
   }
 
   .header-inner {
-    max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
+    max-width: calc(var(--max-content-width) + (var(--pad) * 2));
     margin-left: auto;
     margin-right: auto;
-    padding-left: var(--page-margin);
-    padding-right: var(--page-margin);
+    padding-left: var(--pad);
+    padding-right: var(--pad);
     grid-template-columns: 1fr 1fr;
     gap: 0px;
     align-items: flex-start;
@@ -837,9 +837,9 @@ const isCol3 = initialColView === "3";
 
   .mobile-journal-filter-drawer {
     position: fixed;
-    top: calc(var(--page-margin) + var(--header-height) + 2px);
-    left: var(--page-margin);
-    right: var(--page-margin);
+    top: calc(var(--pad) + var(--header-height) + 2px);
+    left: var(--pad);
+    right: var(--pad);
     z-index: 999;
     display: flex;
     flex-direction: column;
@@ -1047,7 +1047,7 @@ const isCol3 = initialColView === "3";
 
   @media (max-width: 768px) {
     .site-header {
-      top: var(--page-margin);
+      top: var(--pad);
     }
 
     .desktop-only {

@@ -185,14 +185,21 @@ const slug =
     border-radius: var(--radius-card);
     flex-shrink: 0;
     width: var(--card-media-width);
+    max-width: 100%;
     aspect-ratio: 3 / 4;
     transition: width 0.5s var(--ease-expo);
     will-change: width;
     touch-action: pan-y;
   }
 
-  .card-media-wrapper:hover,
-  .card-media-wrapper:focus-within {
+  @media (hover: hover) and (pointer: fine) {
+    .card-media-wrapper:hover,
+    .card-media-wrapper:focus-within {
+      width: calc(var(--card-media-width) * 1.2);
+    }
+  }
+
+  .card-media-wrapper.is-scaled {
     width: calc(var(--card-media-width) * 1.2);
   }
 

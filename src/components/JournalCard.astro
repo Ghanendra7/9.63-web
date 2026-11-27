@@ -196,7 +196,7 @@ const initialThumbSlots = hasMultipleImages
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 470px;
+    max-width: 490px;
     padding-right: 20px;
   }
 
@@ -273,8 +273,8 @@ const initialThumbSlots = hasMultipleImages
   }
 
   .journal-active-frame {
-    width: clamp(230px, 24vw, 355px);
-    aspect-ratio: 1 / 1.02;
+    width: 420px;
+    aspect-ratio: 1 / 1;
     border-radius: var(--radius-card);
     overflow: hidden;
     position: relative;
@@ -304,7 +304,7 @@ const initialThumbSlots = hasMultipleImages
   .journal-counter {
     position: absolute;
     top: 2px;
-    left: calc(100% + 8px);
+    left: calc(100% + var(--gutter));
     font-size: var(--text-size);
     line-height: var(--text-leading);
     letter-spacing: var(--text-tracking);
@@ -318,7 +318,7 @@ const initialThumbSlots = hasMultipleImages
     flex: 1 1 0%;
     min-width: 0;
     overflow: hidden;
-    margin-right: calc(-1 * var(--page-margin));
+    margin-right: calc(-1 * var(--pad));
   }
 
   .journal-thumbs-track {
@@ -332,11 +332,17 @@ const initialThumbSlots = hasMultipleImages
     display: flex;
     align-items: flex-start;
     flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity 0.25s ease;
+  }
+
+  .journal-thumb-item:hover {
+    opacity: 0.85;
   }
 
   .journal-thumb-btn {
-    width: clamp(110px, 11.2vw, 165px);
-    aspect-ratio: 1.15 / 1;
+    width: 200px;
+    aspect-ratio: 1 / 1;
     border-radius: var(--radius-card);
     overflow: hidden;
     border: none;
@@ -344,12 +350,6 @@ const initialThumbSlots = hasMultipleImages
     background-color: rgba(240, 240, 240, 0.4);
     cursor: pointer;
     position: relative;
-    opacity: 0.5;
-    transition: opacity 0.25s ease;
-  }
-
-  .journal-thumb-btn:hover {
-    opacity: 0.85;
   }
 
   .journal-thumb-img {

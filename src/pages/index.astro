@@ -13,20 +13,18 @@ const isInitialMulti = initialView === "8" || initialView === "3";
 const DESKTOP_SLOTS = [
   { col: 2, row: 1 },
   { col: 5, row: 1 },
-  { col: 8, row: 1 },
   { col: 1, row: 2 },
-  { col: 6, row: 2 },
   { col: 8, row: 2 },
   { col: 3, row: 3 },
   { col: 7, row: 3 },
   { col: 8, row: 3 },
+  { col: 9, row: 3 },
   { col: 1, row: 4 },
   { col: 6, row: 4 },
   { col: 3, row: 5 },
-  { col: 8, row: 5 },
+  { col: 9, row: 5 },
   { col: 2, row: 6 },
   { col: 8, row: 6 },
-  { col: 5, row: 6 },
 ];
 
 const MOBILE_SLOTS = [
@@ -102,10 +100,10 @@ const MOBILE_SLOTS = [
   .home-container {
     width: 100%;
     min-height: 100dvh;
-    padding-bottom: var(--page-margin);
-    padding-left: var(--page-margin);
-    padding-right: var(--page-margin);
-    max-width: calc(var(--max-content-width) + (var(--page-margin) * 2));
+    padding-bottom: var(--pad);
+    padding-left: var(--pad);
+    padding-right: var(--pad);
+    max-width: calc(var(--max-content-width) + (var(--pad) * 2));
     margin-left: auto;
     margin-right: auto;
   }
@@ -131,7 +129,7 @@ const MOBILE_SLOTS = [
 
   .constellation-grid {
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(9, minmax(0, 1fr));
     gap: 2px;
     padding-top: 130px;
     width: 100%;

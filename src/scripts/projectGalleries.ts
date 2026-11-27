@@ -2,6 +2,20 @@ export function initProjectGalleries() {
   const wrappers = document.querySelectorAll<HTMLElement>(
     "[data-project-media]",
   );
+  const isTouchDevice = () =>
+    !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  if (!(window as any).__projectScaleOutsideInit) {
+    (window as any).__projectScaleOutsideInit = true;
+    document.addEventListener("click", (e) => {
+      if (!isTouchDevice()) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("[data-project-media]")) return;
+      document
+        .querySelectorAll<HTMLElement>("[data-project-media].is-scaled")
+        .forEach((el) => el.classList.remove("is-scaled"));
+    });
+  }
 
   wrappers.forEach((wrapper) => {
     if ((wrapper as any).__galleryInit) return;
@@ -11,9 +25,9 @@ export function initProjectGalleries() {
     const dots =
       wrapper.querySelectorAll<HTMLButtonElement>(".indicator-dot");
     const total = slides.length;
-    if (total <= 1) return;
 
     let currentIdx = 0;
+    let lastSwipeAt = 0;
 
     function setSlide(idx: number) {
       currentIdx = idx;
@@ -32,6 +46,24 @@ export function initProjectGalleries() {
         }
       });
     }
+
+    // Touch / tablet: tap card to toggle scale
+    wrapper.addEventListener("click", (e) => {
+      if (!isTouchDevice()) return;
+      if (Date.now() - lastSwipeAt < 350) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".media-dots-indicator")) return;
+
+      const willScale = !wrapper.classList.contains("is-scaled");
+      document
+        .querySelectorAll<HTMLElement>("[data-project-media].is-scaled")
+        .forEach((el) => {
+          if (el !== wrapper) el.classList.remove("is-scaled");
+        });
+      wrapper.classList.toggle("is-scaled", willScale);
+    });
+
+    if (total <= 1) return;
 
     dots.forEach((dot) => {
       const dotIdx = Number(dot.dataset.dotIndex ?? 0);
@@ -96,6 +128,7 @@ export function initProjectGalleries() {
       "touchend",
       () => {
         if (!isSwiping) return;
+        lastSwipeAt = Date.now();
 
         const diffX = touchEndX - touchStartX;
         const diffY = touchEndY - touchStartY;

@@ -28,7 +28,7 @@
 
   --header-height: 30px;
   --header-top: 17px;
-  --page-margin: 20px;
+  --pad: 20px;
   --max-content-width: 2560px;
 
   --grid-columns: 8;
@@ -45,6 +45,6 @@
 @media (max-width: 768px) {
   :root {
     --text-size: 12px;
-    --page-margin: 10px;
+    --pad: 10px;
   }
 }

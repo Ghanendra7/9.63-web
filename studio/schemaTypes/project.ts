@@ -16,13 +16,12 @@ export const projectType = defineType({
     }),
     defineField({
       name: "client",
-      title: "Client / Subtitle",
+      title: "Subtitle",
       type: "string",
     }),
     defineField({
       name: "images",
       title: "Project Images",
-      description: "The first image is the cover (used in 8-column view). Additional images become gallery slides browsable via dots in the 1-column view.",
       type: "array",
       of: [
         {

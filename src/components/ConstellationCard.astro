@@ -54,12 +54,6 @@ const slug =
         decoding="async"
       />
 
-      {project.comingSoon && (
-        <div class="constellation-soon" aria-hidden="true">
-          <span>Coming Soon</span>
-        </div>
-      )}
-
       <div class="constellation-overlay" aria-hidden="true">
         <div class="overlay-pill">
           <span class="overlay-num">{projectNum}</span>
@@ -113,35 +107,6 @@ const slug =
   .primary-img {
     opacity: 1;
     z-index: 1;
-  }
-
-  .constellation-soon {
-    position: absolute;
-    left: 6px;
-    bottom: 6px;
-    z-index: 3;
-    height: var(--header-height);
-    padding: 0 10px;
-    border-radius: var(--radius-pill-sm);
-    background-color: var(--color-pill-frame);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.25s var(--ease-nav);
-  }
-
-  .constellation-card:hover .constellation-soon {
-    opacity: 0;
-  }
-
-  .constellation-soon span {
-    font-size: var(--text-size);
-    line-height: var(--text-leading);
-    letter-spacing: var(--text-tracking);
-    color: rgba(0, 0, 0, 0.35);
-    white-space: nowrap;
   }
 
   .constellation-overlay {
